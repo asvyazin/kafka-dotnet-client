@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kafka.Client
+namespace Kafka.Client.Utils
 {
 	public static class StreamExtensions
 	{
@@ -42,6 +42,12 @@ namespace Kafka.Client
 			await stream.WriteAsync(buffer, 0, buffer.Length);
 		}
 
+		public static void WriteInt32(this Stream stream, Int32 value)
+		{
+			var buffer = BitConverter.GetBytes(value);
+			stream.Write(buffer, 0, buffer.Length);
+		}
+
 		public static async Task<Int16> ReadInt16Async(this Stream stream)
 		{
 			const int length = sizeof(Int16);
@@ -54,6 +60,12 @@ namespace Kafka.Client
 		{
 			var buffer = BitConverter.GetBytes(value);
 			await stream.WriteAsync(buffer, 0, buffer.Length);
+		}
+
+		public static void WriteInt16(this Stream stream, Int16 value)
+		{
+			var buffer = BitConverter.GetBytes(value);
+			stream.Write(buffer, 0, buffer.Length);
 		}
 
 		public static async Task<byte> ReadByteAsync(this Stream stream)
@@ -84,6 +96,12 @@ namespace Kafka.Client
 			await stream.WriteAsync(value, 0, value.Length);
 		}
 
+		public static void WriteBytes(this Stream stream, byte[] value)
+		{
+			stream.WriteInt32(value.Length);
+			stream.Write(value, 0, value.Length);
+		}
+
 		public static async Task<string> ReadStringAsync(this Stream stream)
 		{
 			var bytes = await stream.ReadBytesAsync();
@@ -95,6 +113,11 @@ namespace Kafka.Client
 			await stream.WriteBytesAsync(Encoding.UTF8.GetBytes(value));
 		}
 
+		public static void WriteString(this Stream stream, string value)
+		{
+			stream.WriteBytes(Encoding.UTF8.GetBytes(value));
+		}
+
 		public static async Task<T[]> ReadArrayAsync<T>(this Stream stream, Func<Stream, Task<T>> readValueAsync)
 		{
 			var length = await stream.ReadInt32Async();
@@ -102,6 +125,20 @@ namespace Kafka.Client
 			for (var i = 0; i < length; ++i)
 				result[i] = await readValueAsync(stream);
 			return result;
+		}
+
+		public static async Task WriteArrayAsync<T>(this Stream stream, T[] values, Func<Stream, T, Task> writeValueAsync)
+		{
+			await stream.WriteInt32Async(values.Length);
+			foreach (var t in values)
+				await writeValueAsync(stream, t);
+		}
+
+		public static void WriteArray<T>(this Stream stream, T[] values, Action<Stream, T> writeValue)
+		{
+			stream.WriteInt32(values.Length);
+			foreach (var t in values)
+				writeValue(stream, t);
 		}
 	}
 }
