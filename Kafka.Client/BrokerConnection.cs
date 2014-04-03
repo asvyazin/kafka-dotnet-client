@@ -11,14 +11,14 @@ namespace Kafka.Client
 	public class BrokerConnection: IDisposable
 	{
 		private readonly object locker = new object();
-		private readonly Dictionary<int, TaskCompletionSource<ResponseMessage>> requestsWaiting = new Dictionary<int, TaskCompletionSource<ResponseMessage>>();
+		private readonly Dictionary<int, RequestWaiting> requestsWaiting = new Dictionary<int, RequestWaiting>();
 
 		private const Int16 ApiVersion = 0;
 		private readonly string clientId;
 		private readonly TcpClient tcpClient;
 		private readonly NetworkStream clientStream;
 
-		private volatile int currentCorrelationId = 0;
+		private volatile int currentCorrelationId;
 
 		public BrokerConnection(string clientId, string hostname, int port)
 		{
@@ -30,7 +30,7 @@ namespace Kafka.Client
 		public async Task<ResponseMessage> SendRequest(RequestMessage request)
 		{
 			TaskCompletionSource<ResponseMessage> tcs;
-			var correlationId = RegisterWaitingRequest(out tcs);
+			var correlationId = RegisterWaitingRequest(out tcs, request.ApiKey);
 
 			var memoryStream = new MemoryStream();
 
@@ -45,13 +45,73 @@ namespace Kafka.Client
 			return await tcs.Task;
 		}
 
-		private int RegisterWaitingRequest(out TaskCompletionSource<ResponseMessage> tcs)
+		public async Task Start()
+		{
+			while (true)
+			{
+				await ReceiveResponseMessageAsync();
+			}
+		}
+
+		private async Task ReceiveResponseMessageAsync()
+		{
+			var responseMessageBytes = await clientStream.ReadBytesAsync();
+			using (var memoryStream = new MemoryStream(responseMessageBytes))
+			{
+				var correlationId = memoryStream.ReadInt32();
+				var requestWaiting = RemoveWaitingRequest(correlationId);
+				var responseMessage = DeserializeResponseMessage(requestWaiting.ApiKey, memoryStream);
+				requestWaiting.TaskCompletionSource.SetResult(responseMessage);
+			}
+		}
+
+		private ResponseMessage DeserializeResponseMessage(ApiKey apiKey, Stream stream)
+		{
+			switch (apiKey)
+			{
+				case ApiKey.ProduceRequest:
+					break;
+				case ApiKey.FetchRequest:
+					break;
+				case ApiKey.OffsetRequest:
+					break;
+				case ApiKey.MetadataRequest:
+					return MetadataResponse.FromStream(stream);
+				case ApiKey.LeaderAndIsrRequest:
+					break;
+				case ApiKey.StopReplicaRequest:
+					break;
+				case ApiKey.OffsetCommitRequest:
+					break;
+				case ApiKey.OffsetFetchRequest:
+					break;
+				default:
+					throw new ArgumentOutOfRangeException("apiKey");
+			}
+		}
+
+		private RequestWaiting RemoveWaitingRequest(int correlationId)
+		{
+			lock (locker)
+			{
+				var request = requestsWaiting[correlationId];
+				requestsWaiting.Remove(correlationId);
+				return request;
+			}
+		}
+
+		private int RegisterWaitingRequest(out TaskCompletionSource<ResponseMessage> tcs, ApiKey apiKey)
 		{
 			lock (locker)
 			{
 				var correlationId = GetCorrelationId();
 				tcs = new TaskCompletionSource<ResponseMessage>();
-				requestsWaiting.Add(correlationId, tcs);
+				var requestWaiting = new RequestWaiting
+				{
+					TaskCompletionSource = tcs,
+					ApiKey = apiKey,
+				};
+				requestsWaiting.Add(correlationId, requestWaiting);
 				return correlationId;
 			}
 		}

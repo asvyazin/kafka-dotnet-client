@@ -14,6 +14,13 @@ namespace Kafka.Client.Utils
 				throw new InvalidOperationException(string.Format("Stream read error: expected {0} bytes but has been read {1}", count, bytesRead));
 		}
 
+		public static void ReadExactly(this Stream stream, byte[] buffer, int offset, int count)
+		{
+			var bytesRead = stream.Read(buffer, offset, count);
+			if (bytesRead != count)
+				throw new InvalidOperationException(string.Format("Stream read error: expected {0} bytes but has been read {1}", count, bytesRead));
+		}
+
 		public static async Task<Int64> ReadInt64Async(this Stream stream)
 		{
 			const int length = sizeof(Int64);
@@ -33,6 +40,14 @@ namespace Kafka.Client.Utils
 			const int length = sizeof (Int32);
 			var buffer = new byte[length];
 			await stream.ReadExactlyAsync(buffer, 0, length);
+			return BitConverter.ToInt32(buffer, 0);
+		}
+
+		public static Int32 ReadInt32(this Stream stream)
+		{
+			const int length = sizeof (Int32);
+			var buffer = new byte[length];
+			stream.ReadExactly(buffer, 0, length);
 			return BitConverter.ToInt32(buffer, 0);
 		}
 

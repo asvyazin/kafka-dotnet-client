@@ -43,7 +43,8 @@
     <Compile Include="Messages\ApiKey.cs" />
     <Compile Include="Messages\MetadataRequest.cs" />
     <Compile Include="Messages\RequestMessage.cs" />
-    <Compile Include="ResponseMessage.cs" />
+    <Compile Include="Messages\ResponseMessage.cs" />
+    <Compile Include="RequestWaiting.cs" />
     <Compile Include="Utils\BytesHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
