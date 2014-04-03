@@ -3,7 +3,7 @@ using System.IO;
 using Kafka.Client.Messages;
 using NUnit.Framework;
 
-namespace Kafka.Client.Tests.Tests
+namespace Kafka.Client.Tests
 {
 	[TestFixture]
 	public class SerializationTests
