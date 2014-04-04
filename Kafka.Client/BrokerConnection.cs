@@ -32,20 +32,22 @@ namespace Kafka.Client
 			TaskCompletionSource<ResponseMessage> tcs;
 			var correlationId = RegisterWaitingRequest(out tcs, request.ApiKey);
 
-			var memoryStream = new MemoryStream();
+			byte[] bytes;
+			using (var memoryStream = new MemoryStream())
+			{
+				memoryStream.WriteInt16((Int16)request.ApiKey);
+				memoryStream.WriteInt16(ApiVersion);
+				memoryStream.WriteInt32(correlationId);
+				memoryStream.WriteString(clientId);
+				request.WriteMessage(memoryStream);
+				bytes = memoryStream.ToArray();
+			}
 
-			memoryStream.WriteInt16((Int16)request.ApiKey);
-			memoryStream.WriteInt16(ApiVersion);
-			memoryStream.WriteInt32(correlationId);
-			memoryStream.WriteString(clientId);
-			request.Write(memoryStream);
-
-			await memoryStream.CopyToAsync(clientStream);
-
+			await clientStream.WriteBytesAsync(bytes);
 			return await tcs.Task;
 		}
 
-		public async Task Start()
+		public async void Start()
 		{
 			while (true)
 			{
@@ -56,12 +58,25 @@ namespace Kafka.Client
 		private async Task ReceiveResponseMessageAsync()
 		{
 			var responseMessageBytes = await clientStream.ReadBytesAsync();
-			using (var memoryStream = new MemoryStream(responseMessageBytes))
+			RequestWaiting requestWaiting = null;
+
+			try
 			{
-				var correlationId = memoryStream.ReadInt32();
-				var requestWaiting = RemoveWaitingRequest(correlationId);
-				var responseMessage = DeserializeResponseMessage(requestWaiting.ApiKey, memoryStream);
+				ResponseMessage responseMessage;
+				using (var memoryStream = new MemoryStream(responseMessageBytes))
+				{
+					var correlationId = memoryStream.ReadInt32();
+					requestWaiting = RemoveWaitingRequest(correlationId);
+					responseMessage = DeserializeResponseMessage(requestWaiting.ApiKey, memoryStream);
+				}
 				requestWaiting.TaskCompletionSource.SetResult(responseMessage);
+			}
+			catch (Exception ex)
+			{
+				if (requestWaiting != null)
+					requestWaiting.TaskCompletionSource.SetException(ex);
+				else
+					throw;
 			}
 		}
 
@@ -70,21 +85,21 @@ namespace Kafka.Client
 			switch (apiKey)
 			{
 				case ApiKey.ProduceRequest:
-					break;
+					throw new NotImplementedException();
 				case ApiKey.FetchRequest:
-					break;
+					throw new NotImplementedException();
 				case ApiKey.OffsetRequest:
-					break;
+					throw new NotImplementedException();
 				case ApiKey.MetadataRequest:
 					return MetadataResponse.FromStream(stream);
 				case ApiKey.LeaderAndIsrRequest:
-					break;
+					throw new NotImplementedException();
 				case ApiKey.StopReplicaRequest:
-					break;
+					throw new NotImplementedException();
 				case ApiKey.OffsetCommitRequest:
-					break;
+					throw new NotImplementedException();
 				case ApiKey.OffsetFetchRequest:
-					break;
+					throw new NotImplementedException();
 				default:
 					throw new ArgumentOutOfRangeException("apiKey");
 			}

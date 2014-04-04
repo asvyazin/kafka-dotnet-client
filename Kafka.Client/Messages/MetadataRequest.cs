@@ -13,12 +13,7 @@ namespace Kafka.Client.Messages
 			this.topics = topics ?? new string[0];
 		}
 
-		protected override int GetBytesCount()
-		{
-			return BytesHelper.GetArrayBytesCount(topics);
-		}
-
-		protected override void WriteMessage(Stream stream)
+		public override void WriteMessage(Stream stream)
 		{
 			stream.WriteArray(topics, (s, str) => s.WriteString(str));
 		}

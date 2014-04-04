@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BrokerConnectionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializationTests.cs" />
     <Compile Include="TcpClientTests.cs" />

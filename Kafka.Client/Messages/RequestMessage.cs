@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Kafka.Client.Utils;
 
 namespace Kafka.Client.Messages
 {
@@ -12,14 +11,6 @@ namespace Kafka.Client.Messages
 
 		public ApiKey ApiKey { get; private set; }
 
-		public void Write(Stream stream)
-		{
-			var length = GetBytesCount();
-			stream.WriteInt32(length);
-			WriteMessage(stream);
-		}
-
-		protected abstract int GetBytesCount();
-		protected abstract void WriteMessage(Stream stream);
+		public abstract void WriteMessage(Stream stream);
 	}
 }

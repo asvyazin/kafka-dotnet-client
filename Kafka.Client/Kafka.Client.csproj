@@ -41,9 +41,13 @@
   <ItemGroup>
     <Compile Include="BrokerConnection.cs" />
     <Compile Include="Messages\ApiKey.cs" />
+    <Compile Include="Messages\BrokerMetadata.cs" />
     <Compile Include="Messages\MetadataRequest.cs" />
+    <Compile Include="Messages\MetadataResponse.cs" />
+    <Compile Include="Messages\PartitionMetadata.cs" />
     <Compile Include="Messages\RequestMessage.cs" />
     <Compile Include="Messages\ResponseMessage.cs" />
+    <Compile Include="Messages\TopicMetadata.cs" />
     <Compile Include="RequestWaiting.cs" />
     <Compile Include="Utils\BytesHelper.cs" />
     <Compile Include="Program.cs" />
