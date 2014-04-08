@@ -15,19 +15,24 @@ namespace Kafka.Client
 
 		private const Int16 ApiVersion = 0;
 		private readonly string clientId;
-		private readonly TcpClient tcpClient;
-		private readonly NetworkStream clientStream;
+		private TcpClient tcpClient;
+		private NetworkStream clientStream;
 
 		private volatile int currentCorrelationId;
 
-		public BrokerConnection(string clientId, string hostname, int port)
+		public BrokerConnection(string clientId)
 		{
 			this.clientId = clientId;
-			tcpClient = new TcpClient(hostname, port);
+		}
+
+		public async Task ConnectAsync(string hostname, int port)
+		{
+			tcpClient = new TcpClient();
+			await tcpClient.ConnectAsync(hostname, port);
 			clientStream = tcpClient.GetStream();
 		}
 
-		public async Task<ResponseMessage> SendRequest(RequestMessage request)
+		public async Task<ResponseMessage> SendRequestAsync(RequestMessage request)
 		{
 			TaskCompletionSource<ResponseMessage> tcs;
 			var correlationId = RegisterWaitingRequest(out tcs, request.ApiKey);
@@ -47,7 +52,7 @@ namespace Kafka.Client
 			return await tcs.Task;
 		}
 
-		public async void Start()
+		public async void StartAsync()
 		{
 			while (true)
 			{
@@ -138,8 +143,10 @@ namespace Kafka.Client
 
 		public void Dispose()
 		{
-			clientStream.Dispose();
-			tcpClient.Close();
+			if (clientStream != null)
+				clientStream.Dispose();
+			if (tcpClient != null)
+				tcpClient.Close();
 		}
 	}
 }

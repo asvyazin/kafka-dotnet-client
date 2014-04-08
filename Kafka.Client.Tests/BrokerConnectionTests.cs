@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using Kafka.Client.Messages;
 using NUnit.Framework;
 
@@ -15,14 +15,14 @@ namespace Kafka.Client.Tests
 		[SetUp]
 		public void Setup()
 		{
-			connection = new BrokerConnection(ClientId, BrokerHostname, BrokerPort);
-			connection.Start();
+			connection = new BrokerConnection(ClientId);
+			connection.ConnectAsync(BrokerHostname, BrokerPort).ContinueWith(t => connection.StartAsync()).Wait();
 		}
 
 		[Test]
-		public void Metadata_Test()
+		public async Task Metadata_Test()
 		{
-			var response = (MetadataResponse)connection.SendRequest(new MetadataRequest(new[] { "test" })).Result;
+			var response = (MetadataResponse)await connection.SendRequestAsync(new MetadataRequest(new[] { "test" }));
 			Assert.Greater(response.Brokers.Length, 0);
 		}
 	}
