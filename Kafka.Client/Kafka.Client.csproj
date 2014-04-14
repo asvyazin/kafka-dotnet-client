@@ -41,13 +41,21 @@
   <ItemGroup>
     <Compile Include="BrokerConnection.cs" />
     <Compile Include="Messages\ApiKey.cs" />
-    <Compile Include="Messages\BrokerMetadata.cs" />
-    <Compile Include="Messages\MetadataRequest.cs" />
-    <Compile Include="Messages\MetadataResponse.cs" />
-    <Compile Include="Messages\PartitionMetadata.cs" />
+    <Compile Include="Messages\Message.cs" />
+    <Compile Include="Messages\MessageSetItem.cs" />
+    <Compile Include="Messages\Metadata\BrokerMetadata.cs" />
+    <Compile Include="Messages\Metadata\MetadataRequest.cs" />
+    <Compile Include="Messages\Metadata\MetadataResponse.cs" />
+    <Compile Include="Messages\Metadata\PartitionMetadata.cs" />
+    <Compile Include="Messages\Metadata\TopicMetadata.cs" />
+    <Compile Include="Messages\Produce\ProduceRequest.cs" />
+    <Compile Include="Messages\Produce\ProduceRequestPartitionItem.cs" />
+    <Compile Include="Messages\Produce\ProduceRequestTopicItem.cs" />
+    <Compile Include="Messages\Produce\ProduceResponse.cs" />
+    <Compile Include="Messages\Produce\ProduceResponsePartitionItem.cs" />
+    <Compile Include="Messages\Produce\ProduceResponseTopicItem.cs" />
     <Compile Include="Messages\RequestMessage.cs" />
     <Compile Include="Messages\ResponseMessage.cs" />
-    <Compile Include="Messages\TopicMetadata.cs" />
     <Compile Include="RequestWaiting.cs" />
     <Compile Include="Utils\BytesHelper.cs" />
     <Compile Include="Program.cs" />
@@ -58,6 +66,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

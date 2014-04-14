@@ -2,7 +2,7 @@
 using System.IO;
 using Kafka.Client.Utils;
 
-namespace Kafka.Client.Messages
+namespace Kafka.Client.Messages.Metadata
 {
 	public class TopicMetadata
 	{

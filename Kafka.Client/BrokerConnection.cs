@@ -4,6 +4,8 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Kafka.Client.Messages;
+using Kafka.Client.Messages.Metadata;
+using Kafka.Client.Messages.Produce;
 using Kafka.Client.Utils;
 
 namespace Kafka.Client
@@ -52,11 +54,19 @@ namespace Kafka.Client
 			return await tcs.Task;
 		}
 
-		public async void StartAsync()
+		public async void StartAsync(Action<Exception> onException)
 		{
 			while (true)
 			{
-				await ReceiveResponseMessageAsync();
+				try
+				{
+					await ReceiveResponseMessageAsync();
+				}
+				catch (Exception ex)
+				{
+					onException(ex);
+					break;
+				}
 			}
 		}
 
@@ -90,23 +100,19 @@ namespace Kafka.Client
 			switch (apiKey)
 			{
 				case ApiKey.ProduceRequest:
-					throw new NotImplementedException();
+					return ProduceResponse.FromStream(stream);
 				case ApiKey.FetchRequest:
-					throw new NotImplementedException();
+					return FetchResponse.FromStream(stream);
 				case ApiKey.OffsetRequest:
-					throw new NotImplementedException();
+					return OffsetResponse.FromStream(stream);
 				case ApiKey.MetadataRequest:
 					return MetadataResponse.FromStream(stream);
-				case ApiKey.LeaderAndIsrRequest:
-					throw new NotImplementedException();
-				case ApiKey.StopReplicaRequest:
-					throw new NotImplementedException();
 				case ApiKey.OffsetCommitRequest:
-					throw new NotImplementedException();
+					return OffsetCommitResponse.FromStream(stream);
 				case ApiKey.OffsetFetchRequest:
-					throw new NotImplementedException();
+					return OffsetFetchResponse.FromStream(stream);
 				default:
-					throw new ArgumentOutOfRangeException("apiKey");
+					throw new NotImplementedException();
 			}
 		}
 

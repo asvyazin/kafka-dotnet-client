@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Kafka.Client.Messages;
+using Kafka.Client.Messages.Metadata;
 using NUnit.Framework;
 
 namespace Kafka.Client.Tests

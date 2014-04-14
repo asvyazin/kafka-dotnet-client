@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Kafka.Client.Messages;
+using Kafka.Client.Messages.Metadata;
 using NUnit.Framework;
 
 namespace Kafka.Client.Tests
@@ -16,7 +16,7 @@ namespace Kafka.Client.Tests
 		public void Setup()
 		{
 			connection = new BrokerConnection(ClientId);
-			connection.ConnectAsync(BrokerHostname, BrokerPort).ContinueWith(t => connection.StartAsync()).Wait();
+			connection.ConnectAsync(BrokerHostname, BrokerPort).ContinueWith(t => connection.StartAsync(ex => {})).Wait();
 		}
 
 		[Test]

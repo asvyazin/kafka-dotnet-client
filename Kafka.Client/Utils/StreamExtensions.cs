@@ -38,6 +38,14 @@ namespace Kafka.Client.Utils
 			return BitConverter.ToInt32(buffer.Reverse().ToArray(), 0);
 		}
 
+		public static Int64 ReadInt64(this Stream stream)
+		{
+			const int length = sizeof (Int64);
+			var buffer = new byte[length];
+			stream.ReadExactly(buffer, 0, length);
+			return BitConverter.ToInt64(buffer.Reverse().ToArray(), 0);
+		}
+
 		public static async Task WriteInt32Async(this Stream stream, Int32 value)
 		{
 			var buffer = BitConverter.GetBytes(value).Reverse().ToArray();
@@ -45,6 +53,12 @@ namespace Kafka.Client.Utils
 		}
 
 		public static void WriteInt32(this Stream stream, Int32 value)
+		{
+			var buffer = BitConverter.GetBytes(value).Reverse().ToArray();
+			stream.Write(buffer, 0, buffer.Length);
+		}
+
+		public static void WriteInt64(this Stream stream, Int64 value)
 		{
 			var buffer = BitConverter.GetBytes(value).Reverse().ToArray();
 			stream.Write(buffer, 0, buffer.Length);
