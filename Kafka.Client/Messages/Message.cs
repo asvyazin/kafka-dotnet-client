@@ -29,6 +29,16 @@ namespace Kafka.Client.Messages
 			stream.WriteBytes(Value);
 		}
 
+		public static Message Read(MemoryStream stream)
+		{
+			var crc32 = stream.ReadInt32();
+			var magicByte = (byte)stream.ReadByte();
+			var attributes = (byte) stream.ReadByte();
+			var key = stream.ReadBytes();
+			var value = stream.ReadBytes();
+			return new Message(crc32, magicByte, attributes, key, value);
+		}
+
 		public byte[] Value { get; private set; }
 
 		public byte[] Key { get; private set; }

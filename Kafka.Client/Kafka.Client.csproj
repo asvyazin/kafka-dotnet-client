@@ -41,6 +41,12 @@
   <ItemGroup>
     <Compile Include="BrokerConnection.cs" />
     <Compile Include="Messages\ApiKey.cs" />
+    <Compile Include="Messages\Fetch\FetchRequest.cs" />
+    <Compile Include="Messages\Fetch\FetchRequestPartitionItem.cs" />
+    <Compile Include="Messages\Fetch\FetchRequestTopicItem.cs" />
+    <Compile Include="Messages\Fetch\FetchResponse.cs" />
+    <Compile Include="Messages\Fetch\FetchResponsePartitionItem.cs" />
+    <Compile Include="Messages\Fetch\FetchResponseTopicItem.cs" />
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\MessageSetItem.cs" />
     <Compile Include="Messages\Metadata\BrokerMetadata.cs" />
@@ -48,6 +54,23 @@
     <Compile Include="Messages\Metadata\MetadataResponse.cs" />
     <Compile Include="Messages\Metadata\PartitionMetadata.cs" />
     <Compile Include="Messages\Metadata\TopicMetadata.cs" />
+    <Compile Include="Messages\OffsetCommit\OffsetCommitRequest.cs" />
+    <Compile Include="Messages\OffsetCommit\OffsetCommitRequestPartitionItem.cs" />
+    <Compile Include="Messages\OffsetCommit\OffsetCommitRequestTopicItem.cs" />
+    <Compile Include="Messages\OffsetCommit\OffsetCommitResponse.cs" />
+    <Compile Include="Messages\OffsetCommit\OffsetCommitResponsePartitionItem.cs" />
+    <Compile Include="Messages\OffsetCommit\OffsetCommitResponseTopicItem.cs" />
+    <Compile Include="Messages\OffsetFetch\OffsetFetchRequest.cs" />
+    <Compile Include="Messages\OffsetFetch\OffsetFetchRequestTopicItem.cs" />
+    <Compile Include="Messages\OffsetFetch\OffsetFetchResponse.cs" />
+    <Compile Include="Messages\OffsetFetch\OffsetFetchResponsePartitionItem.cs" />
+    <Compile Include="Messages\OffsetFetch\OffsetFetchResponseTopicItem.cs" />
+    <Compile Include="Messages\Offset\OffsetRequest.cs" />
+    <Compile Include="Messages\Offset\OffsetRequestPartitionItem.cs" />
+    <Compile Include="Messages\Offset\OffsetRequestTopicItem.cs" />
+    <Compile Include="Messages\Offset\OffsetResponse.cs" />
+    <Compile Include="Messages\Offset\OffsetResponsePartitionItem.cs" />
+    <Compile Include="Messages\Offset\OffsetResponseTopicItem.cs" />
     <Compile Include="Messages\Produce\ProduceRequest.cs" />
     <Compile Include="Messages\Produce\ProduceRequestPartitionItem.cs" />
     <Compile Include="Messages\Produce\ProduceRequestTopicItem.cs" />
@@ -56,6 +79,7 @@
     <Compile Include="Messages\Produce\ProduceResponseTopicItem.cs" />
     <Compile Include="Messages\RequestMessage.cs" />
     <Compile Include="Messages\ResponseMessage.cs" />
+    <Compile Include="Messages\UnknownApiKeyException.cs" />
     <Compile Include="RequestWaiting.cs" />
     <Compile Include="Utils\BytesHelper.cs" />
     <Compile Include="Program.cs" />

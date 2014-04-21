@@ -94,6 +94,14 @@ namespace Kafka.Client.Utils
 			return buffer;
 		}
 
+		public static byte[] ReadBytes(this Stream stream)
+		{
+			var length = stream.ReadInt32();
+			var buffer = new byte[length];
+			stream.ReadExactly(buffer, 0, length);
+			return buffer;
+		}
+
 		public static async Task WriteBytesAsync(this Stream stream, byte[] value)
 		{
 			await stream.WriteInt32Async(value.Length);

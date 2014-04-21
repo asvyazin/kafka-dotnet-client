@@ -8,22 +8,22 @@ namespace Kafka.Client.Messages.Produce
 	{
 		public ProduceRequest(Int16 requiredAcks, Int32 timeout, ProduceRequestTopicItem[] topicItems): base(ApiKey.ProduceRequest)
 		{
-			TopicItems = topicItems;
-			Timeout = timeout;
-			RequiredAcks = requiredAcks;
+			this.topicItems = topicItems;
+			this.timeout = timeout;
+			this.requiredAcks = requiredAcks;
 		}
 
 		public override void WriteMessage(Stream stream)
 		{
-			stream.WriteInt16(RequiredAcks);
-			stream.WriteInt32(Timeout);
-			stream.WriteArray(TopicItems, (s, i) => i.Write(stream));
+			stream.WriteInt16(requiredAcks);
+			stream.WriteInt32(timeout);
+			stream.WriteArray(topicItems, (s, i) => i.Write(stream));
 		}
 
-		public ProduceRequestTopicItem[] TopicItems { get; private set; }
+		private readonly ProduceRequestTopicItem[] topicItems;
 
-		public Int16 RequiredAcks { get; private set; }
+		private readonly Int16 requiredAcks;
 
-		public Int32 Timeout { get; private set; }
+		private readonly Int32 timeout;
 	}
 }

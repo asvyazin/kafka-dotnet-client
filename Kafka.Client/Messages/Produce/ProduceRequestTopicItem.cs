@@ -7,18 +7,18 @@ namespace Kafka.Client.Messages.Produce
 	{
 		public ProduceRequestTopicItem(string topicName, ProduceRequestPartitionItem[] partitionItems)
 		{
-			PartitionItems = partitionItems;
-			TopicName = topicName;
+			this.partitionItems = partitionItems;
+			this.topicName = topicName;
 		}
 
 		public void Write(Stream stream)
 		{
-			stream.WriteString(TopicName);
-			stream.WriteArray(PartitionItems, (s, i) => i.Write(stream));
+			stream.WriteString(topicName);
+			stream.WriteArray(partitionItems, (s, i) => i.Write(stream));
 		}
 
-		public ProduceRequestPartitionItem[] PartitionItems { get; private set; }
+		private readonly ProduceRequestPartitionItem[] partitionItems;
 
-		public string TopicName { get; private set; }
+		private readonly string topicName;
 	}
 }

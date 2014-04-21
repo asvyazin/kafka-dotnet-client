@@ -4,8 +4,6 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Kafka.Client.Messages;
-using Kafka.Client.Messages.Metadata;
-using Kafka.Client.Messages.Produce;
 using Kafka.Client.Utils;
 
 namespace Kafka.Client
@@ -82,7 +80,7 @@ namespace Kafka.Client
 				{
 					var correlationId = memoryStream.ReadInt32();
 					requestWaiting = RemoveWaitingRequest(correlationId);
-					responseMessage = DeserializeResponseMessage(requestWaiting.ApiKey, memoryStream);
+					responseMessage = ResponseMessage.FromStream(requestWaiting.ApiKey, memoryStream);
 				}
 				requestWaiting.TaskCompletionSource.SetResult(responseMessage);
 			}
@@ -92,27 +90,6 @@ namespace Kafka.Client
 					requestWaiting.TaskCompletionSource.SetException(ex);
 				else
 					throw;
-			}
-		}
-
-		private ResponseMessage DeserializeResponseMessage(ApiKey apiKey, Stream stream)
-		{
-			switch (apiKey)
-			{
-				case ApiKey.ProduceRequest:
-					return ProduceResponse.FromStream(stream);
-				case ApiKey.FetchRequest:
-					return FetchResponse.FromStream(stream);
-				case ApiKey.OffsetRequest:
-					return OffsetResponse.FromStream(stream);
-				case ApiKey.MetadataRequest:
-					return MetadataResponse.FromStream(stream);
-				case ApiKey.OffsetCommitRequest:
-					return OffsetCommitResponse.FromStream(stream);
-				case ApiKey.OffsetFetchRequest:
-					return OffsetFetchResponse.FromStream(stream);
-				default:
-					throw new NotImplementedException();
 			}
 		}
 
