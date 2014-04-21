@@ -16,7 +16,7 @@ namespace Kafka.Client.Tests
 		public void Setup()
 		{
 			connection = new BrokerConnection(ClientId);
-			connection.ConnectAsync(BrokerHostname, BrokerPort).ContinueWith(t => connection.StartAsync(ex => {})).Wait();
+			connection.ConnectAsync(BrokerHostname, BrokerPort).Wait();
 		}
 
 		[Test]

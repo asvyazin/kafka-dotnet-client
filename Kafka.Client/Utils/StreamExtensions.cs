@@ -2,15 +2,16 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kafka.Client.Utils
 {
 	public static class StreamExtensions
 	{
-		public static async Task ReadExactlyAsync(this Stream stream, byte[] buffer, int offset, int count)
+		public static async Task ReadExactlyAsync(this Stream stream, byte[] buffer, int offset, int count, CancellationToken cancellationToken)
 		{
-			var bytesRead = await stream.ReadAsync(buffer, offset, count);
+			var bytesRead = await stream.ReadAsync(buffer, offset, count, cancellationToken);
 			if (bytesRead != count)
 				throw new InvalidOperationException(string.Format("Stream read error: expected {0} bytes but has been read {1}", count, bytesRead));
 		}
@@ -22,11 +23,11 @@ namespace Kafka.Client.Utils
 				throw new InvalidOperationException(string.Format("Stream read error: expected {0} bytes but has been read {1}", count, bytesRead));
 		}
 
-		public static async Task<Int32> ReadInt32Async(this Stream stream)
+		public static async Task<int> ReadInt32Async(this Stream stream, CancellationToken cancellationToken)
 		{
 			const int length = sizeof (Int32);
 			var buffer = new byte[length];
-			await stream.ReadExactlyAsync(buffer, 0, length);
+			await stream.ReadExactlyAsync(buffer, 0, length, cancellationToken);
 			return BitConverter.ToInt32(buffer.Reverse().ToArray(), 0);
 		}
 
@@ -78,19 +79,19 @@ namespace Kafka.Client.Utils
 			return BitConverter.ToInt16(buffer.Reverse().ToArray(), 0);
 		}
 
-		public static async Task<byte> ReadByteAsync(this Stream stream)
+		public static async Task<byte> ReadByteAsync(this Stream stream, CancellationToken cancellationToken)
 		{
 			const int length = sizeof(byte);
 			var buffer = new byte[length];
-			await stream.ReadExactlyAsync(buffer, 0, length);
+			await stream.ReadExactlyAsync(buffer, 0, length, cancellationToken);
 			return buffer[0];
 		}
 
-		public static async Task<byte[]> ReadBytesAsync(this Stream stream)
+		public static async Task<byte[]> ReadBytesAsync(this Stream stream, CancellationToken cancellationToken)
 		{
-			var length = await stream.ReadInt32Async();
+			var length = await stream.ReadInt32Async(cancellationToken);
 			var buffer = new byte[length];
-			await stream.ReadExactlyAsync(buffer, 0, length);
+			await stream.ReadExactlyAsync(buffer, 0, length, cancellationToken);
 			return buffer;
 		}
 

@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BrokerConnection.cs" />
+    <Compile Include="IWriteable.cs" />
     <Compile Include="Messages\ApiKey.cs" />
     <Compile Include="Messages\Fetch\FetchRequest.cs" />
     <Compile Include="Messages\Fetch\FetchRequestPartitionItem.cs" />
@@ -80,6 +81,9 @@
     <Compile Include="Messages\RequestMessage.cs" />
     <Compile Include="Messages\ResponseMessage.cs" />
     <Compile Include="Messages\UnknownApiKeyException.cs" />
+    <Compile Include="RawProtocol\BrokerRawConnection.cs" />
+    <Compile Include="RawProtocol\RawRequest.cs" />
+    <Compile Include="RawProtocol\RawResponse.cs" />
     <Compile Include="RequestWaiting.cs" />
     <Compile Include="Utils\BytesHelper.cs" />
     <Compile Include="Program.cs" />

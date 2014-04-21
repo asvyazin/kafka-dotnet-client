@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using Kafka.Client.Utils;
 using NUnit.Framework;
@@ -17,7 +18,7 @@ namespace Kafka.Client.Tests
 		public void Test_ClientsRace()
 		{
 			var tcpListener = new TcpListener(IPAddress.Any, Port);
-			var server = RunServer(tcpListener, 2 * Count);
+			var server = RunServer(tcpListener, 2 * Count, CancellationToken.None);
 			var tcpClient = new TcpClient("localhost", Port);
 			var clientStream = tcpClient.GetStream();
 			var client1 = RunClient(clientStream, 0, Count);
@@ -42,14 +43,14 @@ namespace Kafka.Client.Tests
 			await clientStream.WriteAsync(bytes, 0, to - from);
 		}
 
-		private static async Task RunServer(TcpListener tcpListener, int count)
+		private static async Task RunServer(TcpListener tcpListener, int count, CancellationToken cancellationToken)
 		{
 			tcpListener.Start();
 			var serverConnection = await tcpListener.AcceptTcpClientAsync();
 			var serverStream = serverConnection.GetStream();
 			for (var i = 0; i < count; ++i)
 			{
-				var b = await serverStream.ReadByteAsync();
+				var b = await serverStream.ReadByteAsync(cancellationToken);
 				Assert.AreEqual((byte)i, b);
 			}
 		}
