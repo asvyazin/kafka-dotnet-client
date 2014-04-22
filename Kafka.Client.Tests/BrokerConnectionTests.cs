@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Kafka.Client.Messages.Metadata;
+using Kafka.Client.Protocol;
+using Kafka.Client.Protocol.Metadata;
 using NUnit.Framework;
 
 namespace Kafka.Client.Tests

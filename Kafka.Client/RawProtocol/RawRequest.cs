@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Kafka.Client.Messages;
+using Kafka.Client.Protocol;
 using Kafka.Client.Utils;
 
 namespace Kafka.Client.RawProtocol
