@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 using Kafka.Client.Messages;
 using Kafka.Client.Utils;
@@ -53,17 +52,17 @@ namespace Kafka.Client
 			return await tcs.Task;
 		}
 
-		public async Task StartAsync(CancellationToken cancellationToken)
+		public async Task StartAsync()
 		{
 			while (true)
 			{
-				await ReceiveResponseMessageAsync(cancellationToken);
+				await ReceiveResponseMessageAsync();
 			}
 		}
 
-		private async Task ReceiveResponseMessageAsync(CancellationToken cancellationToken)
+		private async Task ReceiveResponseMessageAsync()
 		{
-			var responseMessageBytes = await clientStream.ReadBytesAsync(cancellationToken);
+			var responseMessageBytes = await clientStream.ReadBytesAsync();
 			RequestWaiting requestWaiting = null;
 
 			try

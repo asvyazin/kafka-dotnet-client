@@ -17,29 +17,25 @@ namespace Kafka.Client.Tests
 		[Test]
 		public void ConnectionStartStop()
 		{
-			var cts = new CancellationTokenSource();
-
 			var tcpListener = new TcpListener(IPAddress.Any, Port);
-			var serverTask = RunServer(tcpListener, cts.Token);
+			var serverTask = RunServer(tcpListener);
 
-			using (var tcpClient = new TcpClient("localhost", Port))
-			using (var conn = new BrokerRawConnection(tcpClient))
-			{
-				var clientTask = conn.StartAsync(cts.Token);
-				cts.CancelAfter(TimeSpan.FromSeconds(1));
-				var ex = Assert.Throws<AggregateException>(() => Task.WaitAll(new[] {serverTask, clientTask}, TimeSpan.FromSeconds(10)));
-				Assert.That(ex.InnerExceptions.Count, Is.EqualTo(2));
-				Assert.That(ex.InnerExceptions, Is.All.InstanceOf<TaskCanceledException>());
-			}
+			var conn = new BrokerRawConnection("localhost", Port);
+			var clientTask = conn.StartAsync();
+			Thread.Sleep(TimeSpan.FromSeconds(1));
+			conn.Dispose();
+
+			var ex = Assert.Throws<AggregateException>(() => Task.WaitAll(new[] {serverTask, clientTask}, TimeSpan.FromSeconds(10)));
+			Assert.That(ex.InnerExceptions.Count, Is.EqualTo(2));
 		}
 
-		private static async Task RunServer(TcpListener tcpListener, CancellationToken cancellationToken)
+		private static async Task RunServer(TcpListener tcpListener)
 		{
 			tcpListener.Start();
 			var serverConnection = await tcpListener.AcceptTcpClientAsync();
 			var serverStream = serverConnection.GetStream();
 			Console.WriteLine("accepted client connection");
-			await serverStream.ReadByteAsync(cancellationToken);
+			await serverStream.ReadByteAsync();
 		}
 	}
 }
