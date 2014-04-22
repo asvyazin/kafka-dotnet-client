@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Kafka.Client.Utils;
 
 namespace Kafka.Client.Messages.OffsetFetch
@@ -8,7 +9,9 @@ namespace Kafka.Client.Messages.OffsetFetch
 		private readonly string consumerGroup;
 		private readonly OffsetFetchRequestTopicItem[] topicItems;
 
-		public OffsetFetchRequest(string consumerGroup, OffsetFetchRequestTopicItem[] topicItems) : base(ApiKey.OffsetFetchRequest)
+		private const Int16 Version = 0;
+		public OffsetFetchRequest(string consumerGroup, OffsetFetchRequestTopicItem[] topicItems)
+			: base(ApiKey.OffsetFetchRequest, Version)
 		{
 			this.consumerGroup = consumerGroup;
 			this.topicItems = topicItems;

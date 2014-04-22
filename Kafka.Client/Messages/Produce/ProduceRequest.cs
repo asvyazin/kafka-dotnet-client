@@ -6,7 +6,9 @@ namespace Kafka.Client.Messages.Produce
 {
 	public class ProduceRequest : RequestMessage
 	{
-		public ProduceRequest(Int16 requiredAcks, Int32 timeout, ProduceRequestTopicItem[] topicItems): base(ApiKey.ProduceRequest)
+		private const Int16 Version = 0;
+		public ProduceRequest(Int16 requiredAcks, Int32 timeout, ProduceRequestTopicItem[] topicItems)
+			: base(ApiKey.ProduceRequest, Version)
 		{
 			this.topicItems = topicItems;
 			this.timeout = timeout;

@@ -6,7 +6,9 @@ namespace Kafka.Client.Messages.Offset
 {
 	public class OffsetRequest: RequestMessage
 	{
-		public OffsetRequest(Int32 replicaId, OffsetRequestTopicItem[] topicItems) : base(ApiKey.OffsetRequest)
+		private const Int16 Version = 0;
+		public OffsetRequest(Int32 replicaId, OffsetRequestTopicItem[] topicItems)
+			: base(ApiKey.OffsetRequest, Version)
 		{
 			this.topicItems = topicItems;
 			this.replicaId = replicaId;

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Kafka.Client.Utils;
 
 namespace Kafka.Client.Messages.Fetch
@@ -9,8 +10,10 @@ namespace Kafka.Client.Messages.Fetch
 		private readonly int maxWaitTime;
 		private readonly int minBytes;
 		private readonly FetchRequestTopicItem[] topicItems;
+		private const Int16 Version = 0;
 
-		public FetchRequest(int replicaId, int maxWaitTime, int minBytes, FetchRequestTopicItem[] topicItems): base(ApiKey.FetchRequest)
+		public FetchRequest(int replicaId, int maxWaitTime, int minBytes, FetchRequestTopicItem[] topicItems)
+			: base(ApiKey.FetchRequest, Version)
 		{
 			this.replicaId = replicaId;
 			this.maxWaitTime = maxWaitTime;

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Kafka.Client.Utils;
 
 namespace Kafka.Client.Messages.Metadata
@@ -6,9 +7,10 @@ namespace Kafka.Client.Messages.Metadata
 	public class MetadataRequest : RequestMessage
 	{
 		private readonly string[] topics;
+		private const Int16 Version = 0;
 
 		public MetadataRequest(string[] topics = null)
-			: base(ApiKey.MetadataRequest)
+			: base(ApiKey.MetadataRequest, Version)
 		{
 			this.topics = topics ?? new string[0];
 		}

@@ -1,11 +1,14 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Kafka.Client.Utils;
 
 namespace Kafka.Client.Messages.OffsetCommit
 {
 	public class OffsetCommitRequest: RequestMessage
 	{
-		public OffsetCommitRequest(string consumerGroup, OffsetCommitRequestTopicItem[] topicItems) : base(ApiKey.OffsetCommitRequest)
+		private const Int16 Version = 0;
+		public OffsetCommitRequest(string consumerGroup, OffsetCommitRequestTopicItem[] topicItems)
+			: base(ApiKey.OffsetCommitRequest, Version)
 		{
 			this.topicItems = topicItems;
 			this.consumerGroup = consumerGroup;
