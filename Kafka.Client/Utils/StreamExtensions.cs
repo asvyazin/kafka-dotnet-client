@@ -97,33 +97,43 @@ namespace Kafka.Client.Utils
 		public static byte[] ReadBytes(this Stream stream)
 		{
 			var length = stream.ReadInt32();
+			if (length == -1)
+				return null;
+
 			var buffer = new byte[length];
 			stream.ReadExactly(buffer, 0, length);
 			return buffer;
 		}
 
-		public static async Task WriteBytesAsync(this Stream stream, byte[] value)
-		{
-			await stream.WriteInt32Async(value.Length);
-			await stream.WriteAsync(value, 0, value.Length);
-		}
-
 		public static void WriteBytes(this Stream stream, byte[] value)
 		{
-			stream.WriteInt32(value.Length);
-			stream.Write(value, 0, value.Length);
+			if (value == null)
+				stream.WriteInt32(-1);
+			else
+			{
+				stream.WriteInt32(value.Length);
+				stream.Write(value, 0, value.Length);
+			}
 		}
 
 		public static void WriteString(this Stream stream, string value)
 		{
-			var bytes = Encoding.UTF8.GetBytes(value);
-			stream.WriteInt16((Int16)bytes.Length);
-			stream.Write(bytes, 0, bytes.Length);
+			if (value == null)
+				stream.WriteInt16(-1);
+			else
+			{
+				var bytes = Encoding.UTF8.GetBytes(value);
+				stream.WriteInt16((Int16)bytes.Length);
+				stream.Write(bytes, 0, bytes.Length);
+			}
 		}
 
 		public static string ReadString(this Stream stream)
 		{
 			var length = stream.ReadInt16();
+			if (length == -1)
+				return null;
+
 			var bytes = new byte[length];
 			stream.Read(bytes, 0, length);
 			return Encoding.UTF8.GetString(bytes);

@@ -15,10 +15,11 @@ namespace Kafka.Client.RawProtocol
 		public Int32 CorrelationId { get; private set; }
 		public byte[] ResponseData { get; private set; }
 
-		public static RawResponse Read(MemoryStream stream)
+		public static RawResponse Read(Stream stream)
 		{
 			var correlationId = stream.ReadInt32();
-			var responseData = stream.ToArray();
+			var responseData = new byte[stream.Length - stream.Position];
+			stream.Read(responseData, 0, (int)(stream.Length - stream.Position));
 			return new RawResponse(correlationId, responseData);
 		}
 	}

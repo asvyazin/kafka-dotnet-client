@@ -30,5 +30,13 @@ namespace Kafka.Client.Messages
 					throw new UnknownApiKeyException(apiKey);
 			}
 		}
+
+		public static ResponseMessage FromBytes(ApiKey apiKey, byte[] bytes)
+		{
+			using (var ms = new MemoryStream(bytes))
+			{
+				return FromStream(apiKey, ms);
+			}
+		}
 	}
 }

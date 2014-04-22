@@ -15,8 +15,6 @@ namespace Kafka.Client.RawProtocol
 		private readonly ConcurrentDictionary<Int32, TaskCompletionSource<RawResponse>> waitingRequests =
 			new ConcurrentDictionary<int, TaskCompletionSource<RawResponse>>();
 
-		private const int BufferSize = 81920;
-
 		public BrokerRawConnection(string host, int port)
 		{
 			tcpClient = new TcpClient(host, port);
@@ -35,11 +33,13 @@ namespace Kafka.Client.RawProtocol
 		{
 			var tcs = new TaskCompletionSource<RawResponse>();
 			waitingRequests[request.CorrelationId] = tcs;
+			byte[] bytes;
 			using (var ms = new MemoryStream())
 			{
-				request.Write(ms);
-				await ms.CopyToAsync(clientStream, BufferSize);
+				ms.WriteBytes(request.ToBytes());
+				bytes = ms.ToArray();
 			}
+			await clientStream.WriteAsync(bytes, 0, bytes.Length);
 			return await tcs.Task;
 		}
 
@@ -57,7 +57,9 @@ namespace Kafka.Client.RawProtocol
 			using (var ms = new MemoryStream(bytes))
 			{
 				var response = RawResponse.Read(ms);
-				var tcs = waitingRequests[response.CorrelationId];
+				TaskCompletionSource<RawResponse> tcs;
+				if (!waitingRequests.TryRemove(response.CorrelationId, out tcs))
+					throw new InvalidOperationException("Could not remove waiting request from collection");
 				tcs.SetResult(response);
 			}
 		}
