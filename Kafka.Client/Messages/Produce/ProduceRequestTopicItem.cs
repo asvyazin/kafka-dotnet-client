@@ -3,7 +3,7 @@ using Kafka.Client.Utils;
 
 namespace Kafka.Client.Messages.Produce
 {
-	public class ProduceRequestTopicItem
+	public class ProduceRequestTopicItem : IWriteable
 	{
 		public ProduceRequestTopicItem(string topicName, ProduceRequestPartitionItem[] partitionItems)
 		{
@@ -14,7 +14,7 @@ namespace Kafka.Client.Messages.Produce
 		public void Write(Stream stream)
 		{
 			stream.WriteString(topicName);
-			stream.WriteArray(partitionItems, (s, i) => i.Write(stream));
+			stream.WriteArray(partitionItems);
 		}
 
 		private readonly ProduceRequestPartitionItem[] partitionItems;

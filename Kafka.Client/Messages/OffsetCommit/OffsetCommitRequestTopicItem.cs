@@ -3,7 +3,7 @@ using Kafka.Client.Utils;
 
 namespace Kafka.Client.Messages.OffsetCommit
 {
-	public class OffsetCommitRequestTopicItem
+	public class OffsetCommitRequestTopicItem: IWriteable
 	{
 		public OffsetCommitRequestTopicItem(string topicName, OffsetCommitRequestPartitionItem[] partitionItems)
 		{
@@ -14,7 +14,7 @@ namespace Kafka.Client.Messages.OffsetCommit
 		public void Write(Stream stream)
 		{
 			stream.WriteString(topicName);
-			stream.WriteArray(partitionItems, (s, i) => i.Write(s));
+			stream.WriteArray(partitionItems);
 		}
 
 		private readonly OffsetCommitRequestPartitionItem[] partitionItems;

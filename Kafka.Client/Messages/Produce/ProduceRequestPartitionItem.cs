@@ -3,7 +3,7 @@ using Kafka.Client.Utils;
 
 namespace Kafka.Client.Messages.Produce
 {
-	public class ProduceRequestPartitionItem
+	public class ProduceRequestPartitionItem : IWriteable
 	{
 		public ProduceRequestPartitionItem(int partition, MessageSetItem[] messageSet)
 		{

@@ -2,7 +2,7 @@
 
 namespace Kafka.Client.Messages
 {
-	public abstract class RequestMessage
+	public abstract class RequestMessage: IWriteable
 	{
 		protected RequestMessage(ApiKey apiKey)
 		{
@@ -11,6 +11,6 @@ namespace Kafka.Client.Messages
 
 		public ApiKey ApiKey { get; private set; }
 
-		public abstract void WriteMessage(Stream stream);
+		public abstract void Write(Stream stream);
 	}
 }

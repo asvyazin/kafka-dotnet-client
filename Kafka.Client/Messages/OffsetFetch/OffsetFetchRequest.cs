@@ -14,10 +14,10 @@ namespace Kafka.Client.Messages.OffsetFetch
 			this.topicItems = topicItems;
 		}
 
-		public override void WriteMessage(Stream stream)
+		public override void Write(Stream stream)
 		{
 			stream.WriteString(consumerGroup);
-			stream.WriteArray(topicItems, (s, i) => i.Write(s));
+			stream.WriteArray(topicItems);
 		}
 	}
 }

@@ -13,9 +13,9 @@ namespace Kafka.Client.Messages.Metadata
 			this.topics = topics ?? new string[0];
 		}
 
-		public override void WriteMessage(Stream stream)
+		public override void Write(Stream stream)
 		{
-			stream.WriteArray(topics, (s, str) => s.WriteString(str));
+			stream.WriteArray(topics, (s, i) => s.WriteString(i));
 		}
 	}
 }

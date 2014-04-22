@@ -4,7 +4,7 @@ using Kafka.Client.Utils;
 
 namespace Kafka.Client.Messages.Offset
 {
-	public class OffsetRequestPartitionItem
+	public class OffsetRequestPartitionItem: IWriteable
 	{
 		public OffsetRequestPartitionItem(Int32 partitionId, Int64 time, Int32 maxNumberOfOffsets)
 		{

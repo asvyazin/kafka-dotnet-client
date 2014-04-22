@@ -13,11 +13,11 @@ namespace Kafka.Client.Messages.Produce
 			this.requiredAcks = requiredAcks;
 		}
 
-		public override void WriteMessage(Stream stream)
+		public override void Write(Stream stream)
 		{
 			stream.WriteInt16(requiredAcks);
 			stream.WriteInt32(timeout);
-			stream.WriteArray(topicItems, (s, i) => i.Write(stream));
+			stream.WriteArray(topicItems);
 		}
 
 		private readonly ProduceRequestTopicItem[] topicItems;

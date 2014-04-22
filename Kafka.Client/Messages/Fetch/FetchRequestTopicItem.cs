@@ -3,7 +3,7 @@ using Kafka.Client.Utils;
 
 namespace Kafka.Client.Messages.Fetch
 {
-	public class FetchRequestTopicItem
+	public class FetchRequestTopicItem: IWriteable
 	{
 		private readonly string topicName;
 		private readonly FetchRequestPartitionItem[] partitionItems;
@@ -17,7 +17,7 @@ namespace Kafka.Client.Messages.Fetch
 		public void Write(Stream stream)
 		{
 			stream.WriteString(topicName);
-			stream.WriteArray(partitionItems, (s, t) => t.Write(s));
+			stream.WriteArray(partitionItems);
 		}
 	}
 }

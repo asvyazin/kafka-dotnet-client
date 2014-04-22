@@ -4,7 +4,7 @@ using Kafka.Client.Utils;
 
 namespace Kafka.Client.Messages.OffsetFetch
 {
-	public class OffsetFetchRequestTopicItem
+	public class OffsetFetchRequestTopicItem : IWriteable
 	{
 		private readonly string topicName;
 		private readonly Int32[] partitions;

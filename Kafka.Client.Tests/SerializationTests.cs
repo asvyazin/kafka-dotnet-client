@@ -31,7 +31,7 @@ namespace Kafka.Client.Tests
 		{
 			using (var stream = new MemoryStream())
 			{
-				message.WriteMessage(stream);
+				message.Write(stream);
 				return stream.ToArray();
 			}
 		}

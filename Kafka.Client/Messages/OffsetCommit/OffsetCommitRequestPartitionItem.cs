@@ -4,7 +4,7 @@ using Kafka.Client.Utils;
 
 namespace Kafka.Client.Messages.OffsetCommit
 {
-	public class OffsetCommitRequestPartitionItem
+	public class OffsetCommitRequestPartitionItem: IWriteable
 	{
 		private readonly Int32 partitionId;
 		private readonly Int64 offset;

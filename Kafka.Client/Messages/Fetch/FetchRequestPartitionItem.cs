@@ -3,7 +3,7 @@ using Kafka.Client.Utils;
 
 namespace Kafka.Client.Messages.Fetch
 {
-	public class FetchRequestPartitionItem
+	public class FetchRequestPartitionItem: IWriteable
 	{
 		private readonly int partitionId;
 		private readonly long offset;

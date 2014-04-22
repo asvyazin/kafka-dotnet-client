@@ -18,12 +18,12 @@ namespace Kafka.Client.Messages.Fetch
 			this.topicItems = topicItems;
 		}
 
-		public override void WriteMessage(Stream stream)
+		public override void Write(Stream stream)
 		{
 			stream.WriteInt32(replicaId);
 			stream.WriteInt32(maxWaitTime);
 			stream.WriteInt32(minBytes);
-			stream.WriteArray(topicItems, (s, t) => t.Write(s));
+			stream.WriteArray(topicItems);
 		}
 	}
 }

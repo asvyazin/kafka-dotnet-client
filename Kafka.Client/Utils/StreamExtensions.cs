@@ -139,11 +139,16 @@ namespace Kafka.Client.Utils
 			return result;
 		}
 
-		public static void WriteArray<T>(this Stream stream, T[] values, Action<Stream, T> writeValue)
+		public static void WriteArray<T>(this Stream stream, T[] values) where T: IWriteable
+		{
+			stream.WriteArray(values, (s, i) => i.Write(s));
+		}
+
+		public static void WriteArray<T>(this Stream stream, T[] values, Action<Stream, T> writeItem)
 		{
 			stream.WriteInt32(values.Length);
 			foreach (var t in values)
-				writeValue(stream, t);
+				writeItem(stream, t);
 		}
 	}
 }

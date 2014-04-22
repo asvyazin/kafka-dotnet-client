@@ -45,7 +45,7 @@ namespace Kafka.Client
 				memoryStream.WriteInt16(ApiVersion);
 				memoryStream.WriteInt32(correlationId);
 				memoryStream.WriteString(clientId);
-				request.WriteMessage(memoryStream);
+				request.Write(memoryStream);
 				bytes = memoryStream.ToArray();
 			}
 

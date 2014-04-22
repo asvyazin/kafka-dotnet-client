@@ -12,10 +12,10 @@ namespace Kafka.Client.Messages.Offset
 			this.replicaId = replicaId;
 		}
 
-		public override void WriteMessage(Stream stream)
+		public override void Write(Stream stream)
 		{
 			stream.WriteInt32(replicaId);
-			stream.WriteArray(topicItems, (s, i) => i.Write(s));
+			stream.WriteArray(topicItems);
 		}
 
 		private readonly OffsetRequestTopicItem[] topicItems;

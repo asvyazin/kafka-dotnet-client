@@ -11,10 +11,10 @@ namespace Kafka.Client.Messages.OffsetCommit
 			this.consumerGroup = consumerGroup;
 		}
 
-		public override void WriteMessage(Stream stream)
+		public override void Write(Stream stream)
 		{
 			stream.WriteString(consumerGroup);
-			stream.WriteArray(topicItems, (s, i) => i.Write(s));
+			stream.WriteArray(topicItems);
 		}
 
 		private readonly OffsetCommitRequestTopicItem[] topicItems;
