@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using Kafka.Client.Protocol.Metadata;
 
 namespace Kafka.Client.Metadata
@@ -8,6 +10,16 @@ namespace Kafka.Client.Metadata
 	{
 		private readonly ConcurrentDictionary<int, BrokerMetadata> nodes = new ConcurrentDictionary<int, BrokerMetadata>();
 		private readonly ConcurrentDictionary<string, MetadataTopicManager> topicManagers = new ConcurrentDictionary<string, MetadataTopicManager>();
+
+		public bool IsKnownTopic(string topic)
+		{
+			return topicManagers.ContainsKey(topic);
+		}
+
+		public IEnumerable<int> GetAllBrokerIds()
+		{
+			return nodes.Values.Select(b => b.NodeId);
+		}
 
 		public void UpdateMetadata(MetadataResponse metadataResponse)
 		{
