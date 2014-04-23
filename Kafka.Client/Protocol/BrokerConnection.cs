@@ -74,5 +74,13 @@ namespace Kafka.Client.Protocol
 				brokerRawConnection = null;
 			}
 		}
+
+		public bool IsDisposed()
+		{
+			lock (locker)
+			{
+				return disposed;
+			}
+		}
 	}
 }

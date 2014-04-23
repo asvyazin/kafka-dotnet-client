@@ -42,6 +42,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Connection\BrokerConnectionManager.cs" />
     <Compile Include="Metadata\MetadataManager.cs" />
     <Compile Include="Metadata\MetadataTopicManager.cs" />
     <Compile Include="Metadata\NodeAddress.cs" />
