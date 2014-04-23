@@ -42,6 +42,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Metadata\MetadataManager.cs" />
+    <Compile Include="Metadata\MetadataTopicManager.cs" />
+    <Compile Include="Metadata\NodeAddress.cs" />
     <Compile Include="Protocol\ApiKey.cs" />
     <Compile Include="Protocol\BrokerConnection.cs" />
     <Compile Include="Protocol\Fetch\FetchRequest.cs" />

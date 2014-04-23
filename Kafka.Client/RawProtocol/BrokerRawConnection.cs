@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Kafka.Client.Metadata;
 using Kafka.Client.Utils;
 
 namespace Kafka.Client.RawProtocol
@@ -15,9 +16,9 @@ namespace Kafka.Client.RawProtocol
 		private readonly ConcurrentDictionary<Int32, TaskCompletionSource<RawResponse>> waitingRequests =
 			new ConcurrentDictionary<int, TaskCompletionSource<RawResponse>>();
 
-		public BrokerRawConnection(string host, int port)
+		public BrokerRawConnection(NodeAddress nodeAddress)
 		{
-			tcpClient = new TcpClient(host, port);
+			tcpClient = new TcpClient(nodeAddress.Host, nodeAddress.Port);
 			clientStream = tcpClient.GetStream();
 		}
 

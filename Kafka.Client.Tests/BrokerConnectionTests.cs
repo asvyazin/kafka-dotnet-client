@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Kafka.Client.Metadata;
 using Kafka.Client.Protocol;
 using Kafka.Client.Protocol.Metadata;
 using NUnit.Framework;
@@ -13,13 +14,14 @@ namespace Kafka.Client.Tests
 		private BrokerConnection connection;
 		private const int BrokerPort = 9092;
 		private const string BrokerHostname = "127.0.0.1";
+		private static readonly NodeAddress BrokerNodeAddress = new NodeAddress(BrokerHostname, BrokerPort);
 		private const string ClientId = "testClient";
 		private Task connectionTask;
 
 		[SetUp]
 		public void Setup()
 		{
-			connection = new BrokerConnection(ClientId, BrokerHostname, BrokerPort);
+			connection = new BrokerConnection(ClientId, BrokerNodeAddress);
 			connectionTask = connection.StartAsync();
 		}
 

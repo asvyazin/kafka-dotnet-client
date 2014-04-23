@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafka.Client.Metadata;
 using Kafka.Client.RawProtocol;
 using Kafka.Client.Utils;
 using NUnit.Framework;
@@ -13,6 +14,7 @@ namespace Kafka.Client.Tests
 	public class BrokerRawConnectionTests
 	{
 		private const int Port = 12345;
+		private readonly NodeAddress nodeAddress = new NodeAddress("localhost", Port);
 
 		[Test]
 		public void ConnectionStartStop()
@@ -20,7 +22,7 @@ namespace Kafka.Client.Tests
 			var tcpListener = new TcpListener(IPAddress.Any, Port);
 			var serverTask = RunServer(tcpListener);
 
-			var conn = new BrokerRawConnection("localhost", Port);
+			var conn = new BrokerRawConnection(nodeAddress);
 			var clientTask = conn.StartAsync();
 			Thread.Sleep(TimeSpan.FromSeconds(1));
 			conn.Dispose();

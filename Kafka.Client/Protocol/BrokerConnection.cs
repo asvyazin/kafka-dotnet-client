@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Kafka.Client.Metadata;
 using Kafka.Client.RawProtocol;
 using Kafka.Client.Utils;
 
@@ -12,10 +13,10 @@ namespace Kafka.Client.Protocol
 
 		private volatile int currentCorrelationId;
 
-		public BrokerConnection(string clientId, string host, int port)
+		public BrokerConnection(string clientId, NodeAddress nodeAddress)
 		{
 			this.clientId = clientId;
-			brokerRawConnection = new BrokerRawConnection(host, port);
+			brokerRawConnection = new BrokerRawConnection(nodeAddress);
 		}
 
 		public async Task StartAsync()

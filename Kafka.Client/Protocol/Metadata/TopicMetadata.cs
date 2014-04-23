@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Kafka.Client.Utils;
 
 namespace Kafka.Client.Protocol.Metadata
@@ -25,6 +26,12 @@ namespace Kafka.Client.Protocol.Metadata
 			var topicName = stream.ReadString();
 			var partitionsMetadata = stream.ReadArray(PartitionMetadata.ReadStream);
 			return new TopicMetadata(topicErrorCode, topicName, partitionsMetadata);
+		}
+
+		public override string ToString()
+		{
+			var partitions = string.Join(", ", PartitionsMetadata.Select(p => p.ToString()).ToArray());
+			return string.Format("PartitionsMetadata: [{0}], TopicName: {1}, TopicErrorCode: {2}", partitions, TopicName, TopicErrorCode);
 		}
 	}
 }
