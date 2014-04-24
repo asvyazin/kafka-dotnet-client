@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Connection\BrokerConnectionManager.cs" />
+    <Compile Include="Interface\BatchProduceRequest.cs" />
+    <Compile Include="Interface\ProduceMessageItem.cs" />
     <Compile Include="KafkaClient.cs" />
     <Compile Include="Metadata\MetadataManager.cs" />
     <Compile Include="Metadata\MetadataTopicManager.cs" />

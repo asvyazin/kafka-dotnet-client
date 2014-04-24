@@ -4,9 +4,11 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Kafka.Client.Connection;
+using Kafka.Client.Interface;
 using Kafka.Client.Metadata;
 using Kafka.Client.Protocol;
 using Kafka.Client.Protocol.Metadata;
+using Kafka.Client.Protocol.Produce;
 
 namespace Kafka.Client
 {
@@ -23,6 +25,53 @@ namespace Kafka.Client
 			this.brokerConnectionManager = brokerConnectionManager;
 			this.bootstrapNodes = bootstrapNodes;
 			this.clientId = clientId;
+		}
+
+		public async Task<ProduceResponse[]> BatchProduceAsync(BatchProduceRequest request)
+		{
+			var unknownTopics = request.Messages
+				.Select(m => m.Topic)
+				.Where(t => !metadataManager.IsKnownTopic(t))
+				.ToArray();
+			if (unknownTopics.Any())
+				await UpdateMetadata(unknownTopics);
+
+			var groupedRequests = request.Messages.Select(m => new
+			{
+				LeaderBrokerId = metadataManager.GetLeaderNodeId(m.Topic, m.PartitionId),
+				Message = m,
+			})
+			.GroupBy(x => x.LeaderBrokerId)
+			.Select(g => new
+			{
+				LeaderBrokerId = g.Key,
+				TopicItems = g.GroupBy(x => x.Message.Topic)
+					.Select(gg => new
+					{
+						TopicName = gg.Key,
+						PartitionItems = gg.GroupBy(xx => xx.Message.PartitionId)
+							.Select(ggg => new
+							{
+								PartitionId = ggg.Key,
+								Messages = ggg.Select(xxx => new MessageSetItem(-1, xxx.Message.Data)).ToArray(),
+							})
+							.Select(x => new ProduceRequestPartitionItem(x.PartitionId, x.Messages))
+							.ToArray(),
+					})
+					.Select(x => new ProduceRequestTopicItem(x.TopicName, x.PartitionItems)).ToArray(),
+			})
+			.Select(x => new
+			{
+				x.LeaderBrokerId,
+				Request = new ProduceRequest(request.RequiredAcks, request.Timeout, x.TopicItems),
+			});
+
+			var tasks = new List<Task<ProduceResponse>>();
+			tasks.AddRange(groupedRequests.Select(r => brokerConnectionManager
+				.GetBrokerConnection(r.LeaderBrokerId)
+				.SendRequestAsync(r.Request)
+				.ContinueWith(t => (ProduceResponse)t.Result)));
+			return await Task.WhenAll(tasks.ToArray());
 		}
 
 		public async Task<ResponseMessage> SendRequestsAsync(string topic, int partitionId, RequestMessage request)
