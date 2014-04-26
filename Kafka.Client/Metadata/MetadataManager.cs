@@ -10,6 +10,7 @@ namespace Kafka.Client.Metadata
 	{
 		private readonly ConcurrentDictionary<int, BrokerMetadata> nodes = new ConcurrentDictionary<int, BrokerMetadata>();
 		private readonly ConcurrentDictionary<string, MetadataTopicManager> topicManagers = new ConcurrentDictionary<string, MetadataTopicManager>();
+		private readonly ConcurrentDictionary<string, int> partitionCounters = new ConcurrentDictionary<string, int>();
 
 		public bool IsKnownTopic(string topic)
 		{
@@ -31,6 +32,8 @@ namespace Kafka.Client.Metadata
 					throw new InvalidOperationException(string.Format("Invalid topic metadata item: {0}", topic));
 				var topicManager = topicManagers.GetOrAdd(topic.TopicName, topicName => new MetadataTopicManager());
 				topicManager.UpdateMetadata(topic.PartitionsMetadata);
+				var partitionsCount = topic.PartitionsMetadata.Length;
+				partitionCounters.AddOrUpdate(topic.TopicName, t => partitionsCount, (t, x) => partitionsCount);
 			}
 		}
 
@@ -48,6 +51,14 @@ namespace Kafka.Client.Metadata
 			if (!nodes.TryGetValue(nodeId, out brokerMetadata))
 				throw new InvalidOperationException(string.Format("Broker with nodeId {0} was not found", nodeId));
 			return new NodeAddress(brokerMetadata.Host, brokerMetadata.Port);
+		}
+
+		public int GetPartitionsCount(string topic)
+		{
+			int partitionsCount;
+			if (!partitionCounters.TryGetValue(topic, out partitionsCount))
+				throw new InvalidOperationException(string.Format("Topic {0} was not found", topic));
+			return partitionsCount;
 		}
 	}
 }

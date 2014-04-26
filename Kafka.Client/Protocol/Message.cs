@@ -6,6 +6,13 @@ namespace Kafka.Client.Protocol
 {
 	public class Message
 	{
+		public Message(byte[] key, byte[] value)
+		{
+			Value = value;
+			Key = key;
+			// todo: compute CRC and stuff
+		}
+
 		public Message(int crc32, byte magicByte, byte attributes, byte[] key, byte[] value)
 		{
 			Value = value;
