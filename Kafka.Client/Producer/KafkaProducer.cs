@@ -123,13 +123,18 @@ namespace Kafka.Client.Producer
 		{
 			foreach (var nodeId in nodeIds)
 			{
+				BrokerConnection conn = null;
 				try
 				{
-					var conn = brokerConnectionManager.GetBrokerConnection(nodeId);
+					conn = brokerConnectionManager.GetBrokerConnection(nodeId);
 					await UpdateMetadataFromBrokerConnection(conn, topicsToUpdate);
 					return;
 				}
-				catch (SocketException) {}
+				catch (SocketException)
+				{
+					if (conn != null)
+						conn.Dispose();
+				}
 			}
 		}
 
