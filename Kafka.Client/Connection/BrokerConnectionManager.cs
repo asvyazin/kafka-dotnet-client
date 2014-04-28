@@ -1,20 +1,20 @@
 ﻿using System.Collections.Concurrent;
 using Kafka.Client.Metadata;
-using Kafka.Client.Protocol;
+using Kafka.Client.Metadata.Store;
 
 namespace Kafka.Client.Connection
 {
 	public class BrokerConnectionManager
 	{
-		private readonly MetadataManager metadataManager;
+		private readonly MetadataStore metadataStore;
 		private readonly ConcurrentDictionary<int, BrokerConnection> connections =
 			new ConcurrentDictionary<int, BrokerConnection>();
 
 		private readonly string clientId;
 
-		public BrokerConnectionManager(string clientId, MetadataManager metadataManager)
+		public BrokerConnectionManager(string clientId, MetadataStore metadataStore)
 		{
-			this.metadataManager = metadataManager;
+			this.metadataStore = metadataStore;
 			this.clientId = clientId;
 		}
 
@@ -27,7 +27,7 @@ namespace Kafka.Client.Connection
 					return brokerConnection;
 			}
 
-			var brokerNodeAddress = metadataManager.GetNodeAddress(brokerId);
+			var brokerNodeAddress = metadataStore.GetNodeAddress(brokerId);
 			brokerConnection = new BrokerConnection(clientId, brokerNodeAddress);
 			connections.AddOrUpdate(brokerId, id => brokerConnection,
 				(id, existingConnection) => brokerConnection);

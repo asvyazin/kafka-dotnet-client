@@ -3,8 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Kafka.Client.Connection.Raw;
 using Kafka.Client.Metadata;
-using Kafka.Client.RawProtocol;
 using Kafka.Client.Utils;
 using NUnit.Framework;
 
