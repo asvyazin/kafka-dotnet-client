@@ -28,10 +28,13 @@ namespace Kafka.Client.Producer
 			this.metadataManager = metadataManager;
 		}
 
-		public async Task SendMessagesAsync(IEnumerable<KeyedMessage<TKey, TValue>> messages)
+		public async Task SendMessagesAsync(KeyedMessage<TKey, TValue>[] messages)
 		{
-			var messagesToSend = messages;
+			var unknownTopics = messages.Select(m => m.Topic).Where(t => !metadataManager.IsKnownTopic(t)).ToArray();
+			if (unknownTopics.Any())
+				await metadataManager.UpdateMetadata(unknownTopics);
 
+			IEnumerable<KeyedMessage<TKey, TValue>> messagesToSend = messages;
 			for (var i = 0; i < settings.SendRetryCount + 1; i++)
 			{
 				var preparedMessages = messagesToSend
@@ -56,7 +59,7 @@ namespace Kafka.Client.Producer
 					.GroupBy(x => x.BrokerId)
 					.Select(g => new
 					{
-						BrokerId = g.Key,
+						BrokerAddress = metadataManager.GetBroker(g.Key),
 						TopicItems = g
 							.GroupBy(x => x.Message.Topic)
 							.Select(gg => new
@@ -77,15 +80,16 @@ namespace Kafka.Client.Producer
 					})
 					.Select(x => new
 					{
-						BrokerConnection = brokerConnectionManager.GetBrokerConnection(x.BrokerId),
+						BrokerConnection = brokerConnectionManager.GetBrokerConnection(x.BrokerAddress),
 						Request = new ProduceRequest(settings.RequiredAcks, settings.Timeout, x.TopicItems),
 					})
-					.Select(x => x.BrokerConnection.SendRequestAsync(x.Request).ContinueWith(t => (ProduceResponse)t.Result));
+					.Select(x => x.BrokerConnection.SendRequestAsync(x.Request));
 
 				var responses = await Task.WhenAll(tasks);
+				var produceResponses = responses.Cast<ProduceResponse>();
 				var failedMessages = new List<KeyedMessage<TKey, TValue>>();
 				var topicsToUpdate = new HashSet<string>();
-				foreach (var topicItem in responses.SelectMany(r => r.TopicItems))
+				foreach (var topicItem in produceResponses.SelectMany(r => r.TopicItems))
 				{
 					var failedPartitionItems = topicItem.PartitionItems.Where(p => p.ErrorCode != 0);
 					foreach (var partitionItem in failedPartitionItems)

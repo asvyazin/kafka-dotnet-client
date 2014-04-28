@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using Kafka.Client.Connection.Protocol.Metadata;
 
 namespace Kafka.Client.Metadata.Store
 {
 	public class MetadataStore
 	{
-		private readonly ConcurrentDictionary<int, BrokerMetadata> nodes = new ConcurrentDictionary<int, BrokerMetadata>();
+		private readonly ConcurrentDictionary<int, BrokerAddress> nodes = new ConcurrentDictionary<int, BrokerAddress>();
 		private readonly ConcurrentDictionary<string, MetadataTopicStore> topicManagers = new ConcurrentDictionary<string, MetadataTopicStore>();
 		private readonly ConcurrentDictionary<string, int> partitionCounters = new ConcurrentDictionary<string, int>();
 
@@ -17,15 +16,19 @@ namespace Kafka.Client.Metadata.Store
 			return topicManagers.ContainsKey(topic);
 		}
 
-		public IEnumerable<int> GetAllBrokerIds()
+		public IEnumerable<BrokerAddress> GetAllBrokers()
 		{
-			return nodes.Values.Select(b => b.NodeId);
+			return nodes.Values;
 		}
 
 		public void UpdateMetadata(MetadataResponse metadataResponse)
 		{
-			foreach (var broker in metadataResponse.Brokers)
-				nodes.AddOrUpdate(broker.NodeId, broker, (id, oldBroker) => broker);
+			foreach (var brokerMetadata in metadataResponse.Brokers)
+			{
+				var brokerAddress = brokerMetadata.ToBrokerAddress();
+				nodes.AddOrUpdate(brokerMetadata.NodeId, brokerAddress, (id, oldBrokerAddress) => brokerAddress);
+			}
+
 			foreach (var topic in metadataResponse.Topics)
 			{
 				if (topic.TopicErrorCode != 0)
@@ -45,12 +48,12 @@ namespace Kafka.Client.Metadata.Store
 			return topicStore.GetPartitionLeaderNodeId(partitionId);
 		}
 
-		public NodeAddress GetNodeAddress(int nodeId)
+		public BrokerAddress GetBroker(int nodeId)
 		{
-			BrokerMetadata brokerMetadata;
-			if (!nodes.TryGetValue(nodeId, out brokerMetadata))
+			BrokerAddress brokerAddress;
+			if (!nodes.TryGetValue(nodeId, out brokerAddress))
 				throw new InvalidOperationException(string.Format("Broker with nodeId {0} was not found", nodeId));
-			return new NodeAddress(brokerMetadata.Host, brokerMetadata.Port);
+			return brokerAddress;
 		}
 
 		public int GetPartitionsCount(string topic)

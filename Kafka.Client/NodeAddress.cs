@@ -1,4 +1,4 @@
-﻿namespace Kafka.Client.Metadata
+﻿namespace Kafka.Client
 {
 	public class NodeAddress
 	{

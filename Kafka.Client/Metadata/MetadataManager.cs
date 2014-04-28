@@ -23,16 +23,16 @@ namespace Kafka.Client.Metadata
 
 		public async Task UpdateMetadata(string[] topicsToUpdate)
 		{
-			var allBrokerIds = metadataStore.GetAllBrokerIds().ToArray();
+			var allBrokerIds = metadataStore.GetAllBrokers().ToArray();
 			if (allBrokerIds.Any())
 				await UpdateMetadataFrom(allBrokerIds, topicsToUpdate);
 			else
 				await UpdateMetadataFromBootstrapNodes(topicsToUpdate);
 		}
 
-		private async Task UpdateMetadataFrom(IEnumerable<int> nodeIds, string[] topicsToUpdate)
+		private async Task UpdateMetadataFrom(IEnumerable<BrokerAddress> brokers, string[] topicsToUpdate)
 		{
-			foreach (var nodeId in nodeIds)
+			foreach (var nodeId in brokers)
 			{
 				BrokerConnection conn = null;
 				try
@@ -79,6 +79,16 @@ namespace Kafka.Client.Metadata
 		public int GetLeaderNodeId(string topic, int partitionId)
 		{
 			return metadataStore.GetLeaderNodeId(topic, partitionId);
+		}
+
+		public BrokerAddress GetBroker(int nodeId)
+		{
+			return metadataStore.GetBroker(nodeId);
+		}
+
+		public bool IsKnownTopic(string topic)
+		{
+			return metadataStore.IsKnownTopic(topic);
 		}
 	}
 }

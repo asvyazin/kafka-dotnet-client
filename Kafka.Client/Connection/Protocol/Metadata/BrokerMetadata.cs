@@ -25,5 +25,14 @@ namespace Kafka.Client.Connection.Protocol.Metadata
 			var port = stream.ReadInt32();
 			return new BrokerMetadata(nodeId, host, port);
 		}
+
+		public BrokerAddress ToBrokerAddress()
+		{
+			return new BrokerAddress
+			{
+				NodeId = NodeId,
+				Endpoint = new NodeAddress(Host, Port),
+			};
+		}
 	}
 }
