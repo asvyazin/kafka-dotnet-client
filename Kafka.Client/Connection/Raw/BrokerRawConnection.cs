@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Kafka.Client.Connection.Raw.Protocol;
-using Kafka.Client.Metadata;
 using Kafka.Client.Utils;
 
 namespace Kafka.Client.Connection.Raw
 {
 	public class BrokerRawConnection: IDisposable
 	{
+		private bool disposed;
+		private readonly object locker = new object();
 		private readonly TcpClient tcpClient;
 		private readonly NetworkStream clientStream;
 
@@ -25,14 +27,22 @@ namespace Kafka.Client.Connection.Raw
 
 		public void Dispose()
 		{
-			if (clientStream != null)
-				clientStream.Dispose();
-			if (tcpClient != null)
-				tcpClient.Close();
+			lock (locker)
+			{
+				if (disposed)
+					return;
+
+				if (clientStream != null)
+					clientStream.Dispose();
+				if (tcpClient != null)
+					tcpClient.Close();
+				disposed = true;
+			}
 		}
 
 		public async Task<RawResponse> SendRawRequestAsync(RawRequest request)
 		{
+			ThrowObjectDisposedExceptionIfNeeded();
 			var tcs = new TaskCompletionSource<RawResponse>();
 			waitingRequests[request.CorrelationId] = tcs;
 			byte[] bytes;
@@ -45,9 +55,19 @@ namespace Kafka.Client.Connection.Raw
 			return await tcs.Task;
 		}
 
+		private void ThrowObjectDisposedExceptionIfNeeded()
+		{
+			lock (locker)
+			{
+				if (disposed)
+					throw new ObjectDisposedException(typeof(BrokerRawConnection).Name);
+			}
+		}
+
 		public async Task StartAsync()
 		{
-			while (true)
+			ThrowObjectDisposedExceptionIfNeeded();
+			while (!disposed)
 			{
 				await ReceiveRawResponse();
 			}
@@ -55,7 +75,28 @@ namespace Kafka.Client.Connection.Raw
 
 		private async Task ReceiveRawResponse()
 		{
-			var bytes = await clientStream.ReadBytesAsync();
+			byte[] bytes;
+			try
+			{
+				bytes = await clientStream.ReadBytesAsync();
+			}
+			catch (Exception ex)
+			{
+				if (!disposed)
+					Dispose();
+
+				while (!waitingRequests.IsEmpty)
+				{
+					var request = waitingRequests.FirstOrDefault();
+
+					TaskCompletionSource<RawResponse> tcs;
+					if (waitingRequests.TryRemove(request.Key, out tcs))
+						tcs.SetException(ex);
+				}
+
+				return;
+			}
+
 			using (var ms = new MemoryStream(bytes))
 			{
 				var response = RawResponse.Read(ms);

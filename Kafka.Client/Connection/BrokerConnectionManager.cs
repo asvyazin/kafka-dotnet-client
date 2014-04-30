@@ -24,6 +24,7 @@ namespace Kafka.Client.Connection
 			}
 
 			brokerConnection = new BrokerConnection(clientId, brokerAddress.Endpoint);
+			brokerConnection.StartAsync();
 			connections.AddOrUpdate(brokerAddress.NodeId, id => brokerConnection,
 				(id, existingConnection) => brokerConnection);
 			return brokerConnection;

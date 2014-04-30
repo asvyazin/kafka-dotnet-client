@@ -30,7 +30,7 @@ namespace Kafka.Client.Producer
 
 		public async Task SendMessagesAsync(KeyedMessage<TKey, TValue>[] messages)
 		{
-			var unknownTopics = messages.Select(m => m.Topic).Where(t => !metadataManager.IsKnownTopic(t)).ToArray();
+			var unknownTopics = messages.Select(m => m.Topic).Where(t => !metadataManager.IsKnownTopic(t)).Distinct().ToArray();
 			if (unknownTopics.Any())
 				await metadataManager.UpdateMetadata(unknownTopics);
 

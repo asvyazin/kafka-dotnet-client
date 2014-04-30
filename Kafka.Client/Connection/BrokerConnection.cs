@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Kafka.Client.Connection.Protocol;
 using Kafka.Client.Connection.Raw;
 using Kafka.Client.Connection.Raw.Protocol;
-using Kafka.Client.Metadata;
 using Kafka.Client.Utils;
 
 namespace Kafka.Client.Connection
@@ -14,7 +13,7 @@ namespace Kafka.Client.Connection
 		private BrokerRawConnection brokerRawConnection;
 
 		private volatile int currentCorrelationId;
-		private bool disposed = true;
+		private bool disposed;
 		private readonly object locker = new object();
 
 		public BrokerConnection(string clientId, NodeAddress nodeAddress)

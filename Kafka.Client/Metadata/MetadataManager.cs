@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -63,12 +64,15 @@ namespace Kafka.Client.Metadata
 				{
 					using (var conn = new BrokerConnection(settings.ClientId, node))
 					{
+						var connectionTask = conn.StartAsync();
 						await UpdateMetadataFromBrokerConnection(conn, topicsToUpdate);
 						return;
 					}
 				}
 				catch (SocketException) { }
 			}
+
+			throw new InvalidOperationException("Error updating metadata from bootstrap nodes: no nodes answered");
 		}
 
 		public int GetPartitionsCount(string topic)

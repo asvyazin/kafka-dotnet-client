@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="BrokerConnectionTests.cs" />
     <Compile Include="BrokerRawConnectionTests.cs" />
+    <Compile Include="KafkaProducerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializationTests.cs" />
     <Compile Include="TcpClientTests.cs" />
