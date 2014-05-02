@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>p4n.crc32</name>
+    </assembly>
+    <members>
+        <member name="T:P4N.CRC32">
+            <summary>
+            Предоставляет функционал для калькуляции контрольной суммы CRC32.
+            </summary>
+        </member>
+        <member name="M:P4N.CRC32.#ctor">
+            <summary>Инициализирует новый экземпляр класса P4N.CRC32.</summary>
+        </member>
+        <member name="M:P4N.CRC32.#ctor(System.UInt32)">
+            <summary>Инициализирует новый экземпляр класса P4N.CRC32 с предустановленным значением контрольной суммы.</summary>
+            <param name="value">Устанавливаемое значение контрольной суммы.</param>
+        </member>
+        <member name="M:P4N.CRC32.Reset">
+            <summary>Производит сброс текущего значения контрольной суммы.</summary>
+        </member>
+        <member name="M:P4N.CRC32.Update(System.Byte)">
+            <summary>Обновляет текущее значение контрольной суммы, «складывая» его с исходным числом.</summary>
+            <param name="number">Исходное число (байт).</param>
+        </member>
+        <member name="M:P4N.CRC32.Update(System.Byte[])">
+            <summary>Обновляет текущее значение контрольной суммы, «складывая» его с исходным массивом байт.</summary>
+            <param name="array">Исходный массив байт.</param>
+        </member>
+        <member name="M:P4N.CRC32.Update(System.Byte[],System.Int32)">
+            <summary>Обновляет текущее значение контрольной суммы, «складывая» его с исходным массивом байт.</summary>
+            <param name="array">Исходный массив байт.</param>
+            <param name="count">Количество используемых ячеек массива от начала.</param>
+        </member>
+        <member name="M:P4N.CRC32.Update(System.Byte[],System.Int32,System.Int32)">
+            <summary>Обновляет текущее значение контрольной суммы, «складывая» его с исходным массивом байт.</summary>
+            <param name="array">Исходный массив байт.</param>
+            <param name="offset">Индекс начальной ячейки массива.</param>
+            <param name="count">Количество используемых ячеек массива от индекса offset.</param>
+        </member>
+        <member name="M:P4N.CRC32.Update(System.Int32)">
+            <summary>Обновляет текущее значение контрольной суммы, «складывая» его с исходным числом.</summary>
+            <param name="number">Исходное число (используются только 8 младших бит).</param>
+        </member>
+        <member name="M:P4N.CRC32.CalcString(System.String)">
+            <summary>Подсчитывает и возвращает контрольную сумму исходной строки.</summary>
+            <param name="string">Исходная строка.</param>
+            <returns>Результирующая контрольная сумма.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcString(System.String,System.Text.Encoding)">
+            <summary>Подсчитывает и возвращает контрольную сумму исходной строки.</summary>
+            <param name="string">Исходная строка.</param>
+            <param name="encoding">Кодировка (по умолчанию UTF-8).</param>
+            <returns>Результирующая контрольная сумма.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcStringAsync(System.String)">
+            <summary>Асинхронно подсчитывает и возвращает контрольную сумму исходной строки.</summary>
+            <param name="string">Исходная строка.</param>
+            <returns>Асинхронная задача, возвращающая результирующую контрольную сумму.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcStringAsync(System.String,System.Text.Encoding)">
+            <summary>Асинхронно подсчитывает и возвращает контрольную сумму исходной строки.</summary>
+            <param name="string">Исходная строка.</param>
+            <param name="encoding">Кодировка (по умолчанию UTF-8).</param>
+            <returns>Асинхронная задача, возвращающая результирующую контрольную сумму.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcArray(System.Byte[])">
+            <summary>Подсчитывает и возвращает контрольную сумму исходного массива байт.</summary>
+            <param name="array">Исходный массив байт.</param>
+            <returns>Результирующая контрольная сумма.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcArray(System.Byte[],System.Int32)">
+            <summary>Подсчитывает и возвращает контрольную сумму исходного массива байт.</summary>
+            <param name="array">Исходный массив байт.</param>
+            <param name="count">Количество используемых ячеек массива от начала.</param>
+            <returns>Результирующая контрольная сумма.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcArray(System.Byte[],System.Int32,System.Int32)">
+            <summary>Подсчитывает и возвращает контрольную сумму исходного массива байт.</summary>
+            <param name="array">Исходный массив байт.</param>
+            <param name="offset">Индекс начальной ячейки массива.</param>
+            <param name="count">Количество используемых ячеек массива от индекса offset.</param>
+            <returns>Результирующая контрольная сумма.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcArrayAsync(System.Byte[])">
+            <summary>Асинхронно подсчитывает и возвращает контрольную сумму исходного массива байт.</summary>
+            <param name="array">Исходный массив байт.</param>
+            <returns>Асинхронная задача, возвращающая результирующую контрольную сумму.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcArrayAsync(System.Byte[],System.Int32)">
+            <summary>Асинхронно подсчитывает и возвращает контрольную сумму исходного массива байт.</summary>
+            <param name="array">Исходный массив байт.</param>
+            <param name="count">Количество используемых ячеек массива от начала.</param>
+            <returns>Асинхронная задача, возвращающая результирующую контрольную сумму.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcArrayAsync(System.Byte[],System.Int32,System.Int32)">
+            <summary>Асинхронно подсчитывает и возвращает контрольную сумму исходного массива байт.</summary>
+            <param name="array">Исходный массив байт.</param>
+            <param name="offset">Индекс начальной ячейки массива.</param>
+            <param name="count">Количество используемых ячеек массива от индекса offset.</param>
+            <returns>Асинхронная задача, возвращающая результирующую контрольную сумму.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcStream(System.IO.Stream,System.Int32)">
+            <summary>Подсчитывает и возвращает контрольную сумму исходного потока.</summary>
+            <param name="stream">Исходный поток.</param>
+            <param name="bufferSize">Размер буфера чтения (по умолчанию 64KiB).</param>
+            <returns>Результирующая контрольная сумма.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcStream(System.IO.Stream,System.Int32,System.Nullable{System.Threading.CancellationToken})">
+            <summary>Подсчитывает и возвращает контрольную сумму исходного потока.</summary>
+            <param name="stream">Исходный поток.</param>
+            <param name="bufferSize">Размер буфера чтения (по умолчанию 64KiB).</param>
+            <param name="cancellationToken">Жетон отмены выполнения операции (по умолчанию не используется).</param>
+            <returns>Результирующая контрольная сумма.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcStreamAsync(System.IO.Stream,System.Int32,System.Nullable{System.Threading.CancellationToken})">
+            <summary>Асинхронно подсчитывает и возвращает контрольную сумму исходного потока.</summary>
+            <param name="stream">Исходный поток.</param>
+            <param name="bufferSize">Размер буфера чтения (по умолчанию 64KiB).</param>
+            <param name="cancellationToken">Жетон отмены выполнения операции (по умолчанию не используется).</param>
+            <returns>Асинхронная задача, возвращающая результирующую контрольную сумму.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcFile(System.String,System.Int32)">
+            <summary>Подсчитывает и возвращает контрольную сумму исходного файла.</summary>
+            <param name="path">Путь к исходному файлу.</param>
+            <param name="bufferSize">Размер буфера чтения (по умолчанию 64KiB).</param>
+            <returns>Результирующая контрольная сумма.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcFile(System.String,System.Int32,System.Nullable{System.Threading.CancellationToken})">
+            <summary>Подсчитывает и возвращает контрольную сумму исходного файла.</summary>
+            <param name="path">Путь к исходному файлу.</param>
+            <param name="bufferSize">Размер буфера чтения (по умолчанию 64KiB).</param>
+            <param name="cancellationToken">Жетон отмены выполнения операции (по умолчанию не используется).</param>
+            <returns>Результирующая контрольная сумма.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcFileAsync(System.String,System.Int32,System.Nullable{System.Threading.CancellationToken})">
+            <summary>Асинхронно подсчитывает и возвращает контрольную сумму исходного файла.</summary>
+            <param name="path">Путь к исходному файлу.</param>
+            <param name="bufferSize">Размер буфера чтения (по умолчанию 64KiB).</param>
+            <param name="cancellationToken">Жетон отмены выполнения операции (по умолчанию не используется).</param>
+            <returns>Асинхронная задача, возвращающая результирующую контрольную сумму.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcWebResource(System.String,System.Net.NetworkCredential,System.Net.WebProxy)">
+            <summary>Подсчитывает и возвращает контрольную сумму исходного web-ресурса (страницы, файла и т.п.).</summary>
+            <param name="address">Адрес (ссылка на исходный web-ресурс).</param>
+            <param name="credentials">Параметры сетевой идентификации (по умолчанию текущие).</param>
+            <param name="proxy">Параметры прокси-сервера (по умолчанию без прокси).</param>
+            <returns>Результирующая контрольная сумма.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcWebResource(System.String,System.Net.NetworkCredential,System.Net.WebProxy,System.Nullable{System.Threading.CancellationToken})">
+            <summary>Подсчитывает и возвращает контрольную сумму исходного web-ресурса (страницы, файла и т.п.).</summary>
+            <param name="address">Адрес (ссылка на исходный web-ресурс).</param>
+            <param name="credentials">Параметры сетевой идентификации (по умолчанию текущие).</param>
+            <param name="proxy">Параметры прокси-сервера (по умолчанию без прокси).</param>
+            <param name="cancellationToken">Жетон отмены выполнения операции (по умолчанию не используется).</param>
+            <returns>Результирующая контрольная сумма.</returns>
+        </member>
+        <member name="M:P4N.CRC32.CalcWebResourceAsync(System.String,System.Net.NetworkCredential,System.Net.WebProxy,System.Nullable{System.Threading.CancellationToken})">
+            <summary>Асинхронно подсчитывает и возвращает контрольную сумму исходного web-ресурса (страницы, файла и т.п.).</summary>
+            <param name="address">Адрес (ссылка на исходный web-ресурс).</param>
+            <param name="credentials">Параметры сетевой идентификации (по умолчанию текущие).</param>
+            <param name="proxy">Параметры прокси-сервера (по умолчанию без прокси).</param>
+            <param name="cancellationToken">Жетон отмены выполнения операции (по умолчанию не используется).</param>
+            <returns>Асинхронная задача, возвращающая результирующую контрольную сумму.</returns>
+        </member>
+        <member name="P:P4N.CRC32.Value">
+            <summary>Текущее значение контрольной суммы.</summary>
+        </member>
+    </members>
+</doc>

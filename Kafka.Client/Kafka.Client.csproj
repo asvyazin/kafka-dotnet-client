@@ -38,6 +38,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="p4n.crc32">
+      <HintPath>..\packages\P4N.CRC32.3.2.0\lib\net45\p4n.crc32.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>

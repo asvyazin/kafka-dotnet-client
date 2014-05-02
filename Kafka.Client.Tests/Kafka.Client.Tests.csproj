@@ -36,12 +36,16 @@
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="p4n.crc32">
+      <HintPath>..\packages\P4N.CRC32.3.2.0\lib\net45\p4n.crc32.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BrokerConnectionTests.cs" />
     <Compile Include="BrokerRawConnectionTests.cs" />
+    <Compile Include="Crc32Tests.cs" />
     <Compile Include="KafkaProducerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializationTests.cs" />

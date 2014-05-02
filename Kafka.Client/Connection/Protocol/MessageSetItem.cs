@@ -5,7 +5,7 @@ using Kafka.Client.Utils;
 
 namespace Kafka.Client.Connection.Protocol
 {
-	public class MessageSetItem
+	public class MessageSetItem: IWriteable
 	{
 		public MessageSetItem(Int64 offset, Message message)
 		{
@@ -45,7 +45,7 @@ namespace Kafka.Client.Connection.Protocol
 			}
 		}
 
-		public static MessageSetItem Read(MemoryStream stream)
+		public static MessageSetItem Read(Stream stream)
 		{
 			var offset = stream.ReadInt64();
 			var message = Message.Read(stream);
