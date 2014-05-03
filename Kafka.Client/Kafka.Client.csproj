@@ -43,6 +43,18 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Reactive.Core">
+      <HintPath>..\packages\Rx-Core.2.2.4\lib\net45\System.Reactive.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces">
+      <HintPath>..\packages\Rx-Interfaces.2.2.4\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Linq">
+      <HintPath>..\packages\Rx-Linq.2.2.4\lib\net45\System.Reactive.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices">
+      <HintPath>..\packages\Rx-PlatformServices.2.2.4\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BrokerAddress.cs" />
@@ -91,6 +103,10 @@
     <Compile Include="Connection\Raw\BrokerRawConnection.cs" />
     <Compile Include="Connection\Raw\Protocol\RawRequest.cs" />
     <Compile Include="Connection\Raw\Protocol\RawResponse.cs" />
+    <Compile Include="Consumer\IDecoder.cs" />
+    <Compile Include="Consumer\KafkaConsumer.cs" />
+    <Compile Include="Consumer\KafkaConsumerSettings.cs" />
+    <Compile Include="Consumer\KeyedMessageAndOffset.cs" />
     <Compile Include="Metadata\MetadataManager.cs" />
     <Compile Include="Metadata\MetadataManagerSettings.cs" />
     <Compile Include="Metadata\Store\MetadataStore.cs" />
