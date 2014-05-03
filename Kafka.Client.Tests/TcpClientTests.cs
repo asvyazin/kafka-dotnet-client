@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using Kafka.Client.Utils;
 using NUnit.Framework;
@@ -49,7 +50,7 @@ namespace Kafka.Client.Tests
 			var serverStream = serverConnection.GetStream();
 			for (var i = 0; i < count; ++i)
 			{
-				var b = await serverStream.ReadByteAsync();
+				var b = await serverStream.ReadByteAsync(CancellationToken.None);
 				Assert.AreEqual((byte)i, b);
 			}
 		}

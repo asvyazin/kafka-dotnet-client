@@ -15,13 +15,11 @@ namespace Kafka.Client.Tests
 		private const string BrokerHostname = "127.0.0.1";
 		private static readonly NodeAddress BrokerNodeAddress = new NodeAddress(BrokerHostname, BrokerPort);
 		private const string ClientId = "testClient";
-		private Task connectionTask;
 
 		[SetUp]
 		public void Setup()
 		{
 			connection = new BrokerConnection(ClientId, BrokerNodeAddress);
-			connectionTask = connection.StartAsync();
 		}
 
 		[Test]

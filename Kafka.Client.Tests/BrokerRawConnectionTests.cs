@@ -4,7 +4,6 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Kafka.Client.Connection.Raw;
-using Kafka.Client.Metadata;
 using Kafka.Client.Utils;
 using NUnit.Framework;
 
@@ -23,7 +22,7 @@ namespace Kafka.Client.Tests
 			var serverTask = RunServer(tcpListener);
 
 			var conn = new BrokerRawConnection(nodeAddress);
-			var clientTask = conn.StartAsync();
+			var clientTask = conn.StartAsync(CancellationToken.None);
 			Thread.Sleep(TimeSpan.FromSeconds(1));
 			conn.Dispose();
 
@@ -37,7 +36,7 @@ namespace Kafka.Client.Tests
 			var serverConnection = await tcpListener.AcceptTcpClientAsync();
 			var serverStream = serverConnection.GetStream();
 			Console.WriteLine("accepted client connection");
-			await serverStream.ReadByteAsync();
+			await serverStream.ReadByteAsync(CancellationToken.None);
 		}
 	}
 }

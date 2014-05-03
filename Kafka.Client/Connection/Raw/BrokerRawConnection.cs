@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using Kafka.Client.Connection.Raw.Protocol;
 using Kafka.Client.Utils;
@@ -64,21 +65,21 @@ namespace Kafka.Client.Connection.Raw
 			}
 		}
 
-		public async Task StartAsync()
+		public async Task StartAsync(CancellationToken cancellationToken)
 		{
 			ThrowObjectDisposedExceptionIfNeeded();
 			while (!disposed)
 			{
-				await ReceiveRawResponse();
+				await ReceiveRawResponse(cancellationToken);
 			}
 		}
 
-		private async Task ReceiveRawResponse()
+		private async Task ReceiveRawResponse(CancellationToken cancellationToken)
 		{
 			byte[] bytes;
 			try
 			{
-				bytes = await clientStream.ReadBytesAsync();
+				bytes = await clientStream.ReadBytesAsync(cancellationToken);
 			}
 			catch (Exception ex)
 			{

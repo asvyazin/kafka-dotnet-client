@@ -64,7 +64,6 @@ namespace Kafka.Client.Metadata
 				{
 					using (var conn = new BrokerConnection(settings.ClientId, node))
 					{
-						var connectionTask = conn.StartAsync();
 						await UpdateMetadataFromBrokerConnection(conn, topicsToUpdate);
 						return;
 					}

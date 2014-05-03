@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Kafka.Client.Connection.Protocol;
 using Kafka.Client.Connection.Raw;
@@ -10,22 +11,19 @@ namespace Kafka.Client.Connection
 	public class BrokerConnection: IDisposable
 	{
 		private readonly string clientId;
-		private BrokerRawConnection brokerRawConnection;
+		private readonly BrokerRawConnection brokerRawConnection;
 
 		private volatile int currentCorrelationId;
 		private bool disposed;
 		private readonly object locker = new object();
+		private readonly Task brokerRawConnectionStartedTask;
+		private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
 		public BrokerConnection(string clientId, NodeAddress nodeAddress)
 		{
 			this.clientId = clientId;
 			brokerRawConnection = new BrokerRawConnection(nodeAddress);
-		}
-
-		public async Task StartAsync()
-		{
-			ThrowObjectDisposedExceptionIfNeeded();
-			await brokerRawConnection.StartAsync();
+			brokerRawConnectionStartedTask = brokerRawConnection.StartAsync(cancellationTokenSource.Token);
 		}
 
 		public async Task<ResponseMessage> SendRequestAsync(RequestMessage request)
@@ -69,10 +67,9 @@ namespace Kafka.Client.Connection
 				if (disposed)
 					return;
 
-				if (brokerRawConnection != null)
-					brokerRawConnection.Dispose();
+				cancellationTokenSource.Cancel();
+				brokerRawConnection.Dispose();
 				disposed = true;
-				brokerRawConnection = null;
 			}
 		}
 
