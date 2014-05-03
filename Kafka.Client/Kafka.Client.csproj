@@ -61,6 +61,7 @@
     <Compile Include="Connection\BrokerConnection.cs" />
     <Compile Include="Connection\BrokerConnectionManager.cs" />
     <Compile Include="Connection\Protocol\ApiKey.cs" />
+    <Compile Include="Connection\Protocol\ErrorCode.cs" />
     <Compile Include="Connection\Protocol\Fetch\FetchRequest.cs" />
     <Compile Include="Connection\Protocol\Fetch\FetchRequestPartitionItem.cs" />
     <Compile Include="Connection\Protocol\Fetch\FetchRequestTopicItem.cs" />

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Kafka.Client.Connection;
+using Kafka.Client.Connection.Protocol;
 using Kafka.Client.Connection.Protocol.Fetch;
 using Kafka.Client.Metadata;
 using Kafka.Client.Producer;
@@ -67,11 +68,15 @@ namespace Kafka.Client.Consumer
 						throw new InvalidOperationException(string.Format("Invalid fetch response, unexpected partitions item count: {0}", topicItem.PartitionItems.Length));
 
 					var partitionItem = topicItem.PartitionItems.First();
-					if (partitionItem.ErrorCode != 0)
+
+					if (partitionItem.ErrorCode == ErrorCode.NotLeaderForPartition)
 					{
 						await metadataManager.UpdateMetadata(new[] { topic });
 						continue;
 					}
+
+					if (partitionItem.ErrorCode != ErrorCode.NoError)
+						throw new InvalidOperationException(string.Format("Error consuming messages from ({0}, {1}): {2}", topic, partitionId, partitionItem.ErrorCode));
 
 					foreach (var messageSetItem in partitionItem.Messages)
 					{

@@ -8,9 +8,9 @@ namespace Kafka.Client.Connection.Protocol.OffsetFetch
 		public int PartitionId { get; private set; }
 		public long Offset { get; private set; }
 		public string Metadata { get; private set; }
-		public short ErrorCode { get; private set; }
+		public ErrorCode ErrorCode { get; private set; }
 
-		private OffsetFetchResponsePartitionItem(int partitionId, long offset, string metadata, short errorCode)
+		private OffsetFetchResponsePartitionItem(int partitionId, long offset, string metadata, ErrorCode errorCode)
 		{
 			PartitionId = partitionId;
 			Offset = offset;
@@ -23,7 +23,7 @@ namespace Kafka.Client.Connection.Protocol.OffsetFetch
 			var partitionId = stream.ReadInt32();
 			var offset = stream.ReadInt64();
 			var metadata = stream.ReadString();
-			var errorCode = stream.ReadInt16();
+			var errorCode = (ErrorCode) stream.ReadInt16();
 			return new OffsetFetchResponsePartitionItem(partitionId, offset, metadata, errorCode);
 		}
 	}

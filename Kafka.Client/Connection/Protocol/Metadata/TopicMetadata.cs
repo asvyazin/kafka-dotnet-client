@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Kafka.Client.Utils;
 
@@ -7,22 +6,22 @@ namespace Kafka.Client.Connection.Protocol.Metadata
 {
 	public class TopicMetadata
 	{
-		private TopicMetadata(Int16 topicErrorCode, string topicName, PartitionMetadata[] partitionsMetadata)
+		private TopicMetadata(ErrorCode topicErrorCode, string topicName, PartitionMetadata[] partitionsMetadata)
 		{
 			TopicErrorCode = topicErrorCode;
 			TopicName = topicName;
 			PartitionsMetadata = partitionsMetadata;
 		}
 
-		public PartitionMetadata[] PartitionsMetadata { get; set; }
+		public PartitionMetadata[] PartitionsMetadata { get; private set; }
 
-		public string TopicName { get; set; }
+		public string TopicName { get; private set; }
 
-		public Int16 TopicErrorCode { get; set; }
+		public ErrorCode TopicErrorCode { get; private set; }
 
 		public static TopicMetadata FromStream(Stream stream)
 		{
-			var topicErrorCode = stream.ReadInt16();
+			var topicErrorCode = (ErrorCode)stream.ReadInt16();
 			var topicName = stream.ReadString();
 			var partitionsMetadata = stream.ReadArray(PartitionMetadata.ReadStream);
 			return new TopicMetadata(topicErrorCode, topicName, partitionsMetadata);

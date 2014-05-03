@@ -34,6 +34,7 @@ namespace Kafka.Client.Producer
 			if (unknownTopics.Any())
 				await metadataManager.UpdateMetadata(unknownTopics);
 
+			var notSentMessages = new List<KeyedMessage<TKey, TValue>>();
 			IEnumerable<KeyedMessage<TKey, TValue>> messagesToSend = messages;
 			for (var i = 0; i < settings.SendRetryCount + 1; i++)
 			{
@@ -54,29 +55,41 @@ namespace Kafka.Client.Producer
 
 				var responses = await Task.WhenAll(tasks);
 				var produceResponses = responses.Cast<ProduceResponse>();
-				var failedMessages = new List<KeyedMessage<TKey, TValue>>();
+				var messagesToReSend = new List<KeyedMessage<TKey, TValue>>();
 				var topicsToUpdate = new HashSet<string>();
 				foreach (var topicItem in produceResponses.SelectMany(r => r.TopicItems))
 				{
-					var failedPartitionItems = topicItem.PartitionItems.Where(p => p.ErrorCode != 0);
-					foreach (var partitionItem in failedPartitionItems)
+					foreach (var partitionItem in topicItem.PartitionItems)
 					{
+						if (partitionItem.ErrorCode == ErrorCode.NoError)
+							continue;
+
 						var key = Tuple.Create(topicItem.TopicName, partitionItem.Partition);
-						failedMessages.AddRange(messagesMap[key]);
-						topicsToUpdate.Add(topicItem.TopicName);
+						var messagesWithError = messagesMap[key];
+
+						if (partitionItem.ErrorCode == ErrorCode.NotLeaderForPartition)
+						{
+							messagesToReSend.AddRange(messagesWithError);
+							topicsToUpdate.Add(topicItem.TopicName);
+						}
+						else
+						{
+							// todo: add error code in exception
+							notSentMessages.AddRange(messagesWithError);
+						}
 					}
 				}
 
-				if (!failedMessages.Any())
-					return;
+				if (!messagesToReSend.Any())
+					break;
 
 				await metadataManager.UpdateMetadata(topicsToUpdate.ToArray());
-				messagesToSend = failedMessages;
+				messagesToSend = messagesToReSend;
 			}
 
-			var notSentMessages = messagesToSend.ToArray();
+			notSentMessages.AddRange(messagesToSend);
 			if (notSentMessages.Any())
-				throw new SendMessagesFailedException<TKey, TValue>(notSentMessages);
+				throw new SendMessagesFailedException<TKey, TValue>(notSentMessages.ToArray());
 		}
 
 		private IEnumerable<PartitionedMessage> PartitionMessages(IEnumerable<KeyedMessage<TKey, TValue>> messagesToSend)

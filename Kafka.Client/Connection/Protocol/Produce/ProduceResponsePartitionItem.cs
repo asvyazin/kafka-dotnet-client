@@ -6,10 +6,10 @@ namespace Kafka.Client.Connection.Protocol.Produce
 	public class ProduceResponsePartitionItem
 	{
 		public int Partition { get; private set; }
-		public short ErrorCode { get; private set; }
+		public ErrorCode ErrorCode { get; private set; }
 		public long Offset { get; private set; }
 
-		private ProduceResponsePartitionItem(int partition, short errorCode, long offset)
+		private ProduceResponsePartitionItem(int partition, ErrorCode errorCode, long offset)
 		{
 			Partition = partition;
 			ErrorCode = errorCode;
@@ -19,7 +19,7 @@ namespace Kafka.Client.Connection.Protocol.Produce
 		public static ProduceResponsePartitionItem FromStream(Stream stream)
 		{
 			var partition = stream.ReadInt32();
-			var errorCode = stream.ReadInt16();
+			var errorCode = (ErrorCode) stream.ReadInt16();
 			var offset = stream.ReadInt64();
 			return new ProduceResponsePartitionItem(partition, errorCode, offset);
 		}

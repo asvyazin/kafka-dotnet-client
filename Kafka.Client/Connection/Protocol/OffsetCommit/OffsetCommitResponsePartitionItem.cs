@@ -6,9 +6,9 @@ namespace Kafka.Client.Connection.Protocol.OffsetCommit
 	public class OffsetCommitResponsePartitionItem
 	{
 		public int PartitionId { get; private set; }
-		public short ErrorCode { get; private set; }
+		public ErrorCode ErrorCode { get; private set; }
 
-		private OffsetCommitResponsePartitionItem(int partitionId, short errorCode)
+		private OffsetCommitResponsePartitionItem(int partitionId, ErrorCode errorCode)
 		{
 			PartitionId = partitionId;
 			ErrorCode = errorCode;
@@ -17,7 +17,7 @@ namespace Kafka.Client.Connection.Protocol.OffsetCommit
 		public static OffsetCommitResponsePartitionItem FromStream(Stream stream)
 		{
 			var partitionId = stream.ReadInt32();
-			var errorCode = stream.ReadInt16();
+			var errorCode = (ErrorCode) stream.ReadInt16();
 			return new OffsetCommitResponsePartitionItem(partitionId, errorCode);
 		}
 	}

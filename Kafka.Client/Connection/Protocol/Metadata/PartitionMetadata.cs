@@ -6,7 +6,7 @@ namespace Kafka.Client.Connection.Protocol.Metadata
 {
 	public class PartitionMetadata
 	{
-		private PartitionMetadata(short partitionErrorCode, int partitionId, int leader, int[] replicas, int[] isrs)
+		private PartitionMetadata(ErrorCode partitionErrorCode, int partitionId, int leader, int[] replicas, int[] isrs)
 		{
 			PartitionErrorCode = partitionErrorCode;
 			PartitionId = partitionId;
@@ -23,11 +23,11 @@ namespace Kafka.Client.Connection.Protocol.Metadata
 
 		public int PartitionId { get; set; }
 
-		public short PartitionErrorCode { get; set; }
+		public ErrorCode PartitionErrorCode { get; set; }
 
 		public static PartitionMetadata ReadStream(Stream stream)
 		{
-			var partitionErrorCode = stream.ReadInt16();
+			var partitionErrorCode = (ErrorCode) stream.ReadInt16();
 			var partitionId = stream.ReadInt32();
 			var leader = stream.ReadInt32();
 			var replicas = stream.ReadArray(s => s.ReadInt32());

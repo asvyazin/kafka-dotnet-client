@@ -7,10 +7,10 @@ namespace Kafka.Client.Connection.Protocol.Offset
 	public class OffsetResponsePartitionItem
 	{
 		public int PartitionId { get; private set; }
-		public short ErrorCode { get; private set; }
+		public ErrorCode ErrorCode { get; private set; }
 		public long[] Offsets { get; private set; }
 
-		private OffsetResponsePartitionItem(Int32 partitionId, Int16 errorCode, Int64[] offsets)
+		private OffsetResponsePartitionItem(Int32 partitionId, ErrorCode errorCode, Int64[] offsets)
 		{
 			PartitionId = partitionId;
 			ErrorCode = errorCode;
@@ -20,7 +20,7 @@ namespace Kafka.Client.Connection.Protocol.Offset
 		public static OffsetResponsePartitionItem FromStream(Stream stream)
 		{
 			var partitionId = stream.ReadInt32();
-			var errorCode = stream.ReadInt16();
+			var errorCode = (ErrorCode) stream.ReadInt16();
 			var offsets = stream.ReadArray(s => s.ReadInt64());
 			return new OffsetResponsePartitionItem(partitionId, errorCode, offsets);
 		}
