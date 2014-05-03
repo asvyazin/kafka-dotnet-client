@@ -34,6 +34,13 @@ namespace Kafka.Client.Connection
 			return ResponseMessage.FromBytes(request.ApiKey, rawResponse.ResponseData);
 		}
 
+		public async Task SendRequestFireAndForgetAsync(RequestMessage request)
+		{
+			ThrowObjectDisposedExceptionIfNeeded();
+			var rawRequest = ToRawRequest(request);
+			await brokerRawConnection.SendRawRequestFireAndForgetAsync(rawRequest);
+		}
+
 		private void ThrowObjectDisposedExceptionIfNeeded()
 		{
 			lock (locker)

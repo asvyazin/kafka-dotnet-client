@@ -37,53 +37,20 @@ namespace Kafka.Client.Producer
 			IEnumerable<KeyedMessage<TKey, TValue>> messagesToSend = messages;
 			for (var i = 0; i < settings.SendRetryCount + 1; i++)
 			{
-				var preparedMessages = messagesToSend
-					.Select(m => new
-					{
-						PartitionId = partitioner.Partition(m.Key, metadataManager.GetPartitionsCount(m.Topic)),
-						Message = m,
-					})
-					.Select(x => new
-					{
-						x.Message,
-						x.PartitionId,
-						BrokerId = metadataManager.GetLeaderNodeId(x.Message.Topic, x.PartitionId),
-					})
-					.ToArray();
+				var partitionedMessages = PartitionMessages(messagesToSend).ToArray();
+				var messagesMap = BuildMessagesMap(partitionedMessages);
+				var connectionAndRequests = GroupMessagesToConnectionAndRequests(partitionedMessages);
 
-				var messagesMap = preparedMessages
-					.GroupBy(x => Tuple.Create(x.Message.Topic, x.PartitionId))
-					.ToDictionary(g => g.Key, g => g.Select(x => x.Message).ToArray());
+				if (settings.RequiredAcks == 0)
+				{
+					// Special case - fire and forget. No error, no success, nothing.
+					await Task.WhenAll(connectionAndRequests
+						.Select(x => x.Connection.SendRequestFireAndForgetAsync(x.Request)));
+					return;
+				}
 
-				var tasks = preparedMessages
-					.GroupBy(x => x.BrokerId)
-					.Select(g => new
-					{
-						BrokerAddress = metadataManager.GetBroker(g.Key),
-						TopicItems = g
-							.GroupBy(x => x.Message.Topic)
-							.Select(gg => new
-							{
-								Topic = gg.Key,
-								PartitionItems = gg
-									.GroupBy(xx => xx.PartitionId)
-									.Select(ggg => new
-									{
-										PartitionId = ggg.Key,
-										MessageSetItems = ggg.Select(xxx => GetMessageSetItem(xxx.Message)).ToArray(),
-									})
-									.Select(xx => new ProduceRequestPartitionItem(xx.PartitionId, xx.MessageSetItems))
-									.ToArray(),
-							})
-							.Select(x => new ProduceRequestTopicItem(x.Topic, x.PartitionItems))
-							.ToArray(),
-					})
-					.Select(x => new
-					{
-						BrokerConnection = brokerConnectionManager.GetBrokerConnection(x.BrokerAddress),
-						Request = new ProduceRequest(settings.RequiredAcks, settings.Timeout, x.TopicItems),
-					})
-					.Select(x => x.BrokerConnection.SendRequestAsync(x.Request));
+				var tasks = connectionAndRequests
+					.Select(x => x.Connection.SendRequestAsync(x.Request));
 
 				var responses = await Task.WhenAll(tasks);
 				var produceResponses = responses.Cast<ProduceResponse>();
@@ -112,9 +79,76 @@ namespace Kafka.Client.Producer
 				throw new SendMessagesFailedException<TKey, TValue>(notSentMessages);
 		}
 
+		private IEnumerable<PartitionedMessage> PartitionMessages(IEnumerable<KeyedMessage<TKey, TValue>> messagesToSend)
+		{
+			return messagesToSend
+				.Select(m => new PartitionedMessage
+				{
+					PartitionId = partitioner.Partition(m.Key, metadataManager.GetPartitionsCount(m.Topic)),
+					Message = m,
+				});
+		}
+
+		private IEnumerable<ConnectionAndRequest> GroupMessagesToConnectionAndRequests(IEnumerable<PartitionedMessage> partitionedMessages)
+		{
+			return partitionedMessages
+				.Select(x => new
+				{
+					x.Message,
+					x.PartitionId,
+					BrokerId = metadataManager.GetLeaderNodeId(x.Message.Topic, x.PartitionId),
+				})
+				.GroupBy(x => x.BrokerId)
+				.Select(g => new
+				{
+					BrokerAddress = metadataManager.GetBroker(g.Key),
+					TopicItems = g
+						.GroupBy(x => x.Message.Topic)
+						.Select(gg => new
+						{
+							Topic = gg.Key,
+							PartitionItems = gg
+								.GroupBy(xx => xx.PartitionId)
+								.Select(ggg => new
+								{
+									PartitionId = ggg.Key,
+									MessageSetItems = ggg.Select(xxx => GetMessageSetItem(xxx.Message)).ToArray(),
+								})
+								.Select(xx => new ProduceRequestPartitionItem(xx.PartitionId, xx.MessageSetItems))
+								.ToArray(),
+						})
+						.Select(x => new ProduceRequestTopicItem(x.Topic, x.PartitionItems))
+						.ToArray(),
+				})
+				.Select(x => new ConnectionAndRequest
+				{
+					Connection = brokerConnectionManager.GetBrokerConnection(x.BrokerAddress),
+					Request = new ProduceRequest(settings.RequiredAcks, settings.Timeout, x.TopicItems),
+				});
+		}
+
+		private static Dictionary<Tuple<string, int>, KeyedMessage<TKey, TValue>[]> BuildMessagesMap(IEnumerable<PartitionedMessage> partitionedMessages)
+		{
+			return partitionedMessages
+				.GroupBy(x => Tuple.Create(x.Message.Topic, x.PartitionId))
+				.ToDictionary(g => g.Key, g => g.Select(x => x.Message).ToArray());
+		}
+
 		private MessageSetItem GetMessageSetItem(KeyedMessage<TKey, TValue> msg)
 		{
 			return new MessageSetItem(-1, new Message(keyEncoder.Encode(msg.Key), valueEncoder.Encode(msg.Value)));
+		}
+
+		private class ConnectionAndRequest
+		{
+			public BrokerConnection Connection { get; set; }
+			public ProduceRequest Request { get; set; }
+		}
+
+		private class PartitionedMessage
+		{
+			public Int32 PartitionId { get; set; }
+			public KeyedMessage<TKey, TValue> Message { get; set; }
 		}
 	}
 }

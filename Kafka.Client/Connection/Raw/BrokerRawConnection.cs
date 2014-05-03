@@ -46,6 +46,18 @@ namespace Kafka.Client.Connection.Raw
 			ThrowObjectDisposedExceptionIfNeeded();
 			var tcs = new TaskCompletionSource<RawResponse>();
 			waitingRequests[request.CorrelationId] = tcs;
+			await SerializeAndSendRequest(request);
+			return await tcs.Task;
+		}
+
+		public async Task SendRawRequestFireAndForgetAsync(RawRequest request)
+		{
+			ThrowObjectDisposedExceptionIfNeeded();
+			await SerializeAndSendRequest(request);
+		}
+
+		private async Task SerializeAndSendRequest(RawRequest request)
+		{
 			byte[] bytes;
 			using (var ms = new MemoryStream())
 			{
@@ -53,7 +65,6 @@ namespace Kafka.Client.Connection.Raw
 				bytes = ms.ToArray();
 			}
 			await clientStream.WriteAsync(bytes, 0, bytes.Length);
-			return await tcs.Task;
 		}
 
 		private void ThrowObjectDisposedExceptionIfNeeded()

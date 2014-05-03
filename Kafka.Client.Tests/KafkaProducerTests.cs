@@ -34,7 +34,9 @@ namespace Kafka.Client.Tests
 		}
 
 		[Test]
-		public void Test_Producer()
+		[TestCase(0)]
+		[TestCase(1)]
+		public void Test_Producer(short requiredAcks)
 		{
 			var encoder = new GuidEncoder();
 			var brokerConnectionManager = new BrokerConnectionManager(ClientId);
@@ -47,7 +49,7 @@ namespace Kafka.Client.Tests
 			var metadataManager = new MetadataManager(metadataStore, brokerConnectionManager, metadataManagerSettings);
 			var producerSettings = new KafkaProducerSettings
 			{
-				RequiredAcks = 1,
+				RequiredAcks = requiredAcks,
 				SendRetryCount = 5,
 				Timeout = 5,
 			};

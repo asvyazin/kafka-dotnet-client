@@ -33,10 +33,10 @@ namespace Kafka.Client.Metadata.Store
 			{
 				if (topic.TopicErrorCode != 0)
 					throw new InvalidOperationException(string.Format("Invalid topic metadata item: {0}", topic));
-				var topicManager = topicManagers.GetOrAdd(topic.TopicName, topicName => new MetadataTopicStore());
-				topicManager.UpdateMetadata(topic.PartitionsMetadata);
 				var partitionsCount = topic.PartitionsMetadata.Length;
 				partitionCounters.AddOrUpdate(topic.TopicName, t => partitionsCount, (t, x) => partitionsCount);
+				var topicManager = topicManagers.GetOrAdd(topic.TopicName, topicName => new MetadataTopicStore());
+				topicManager.UpdateMetadata(topic.PartitionsMetadata);
 			}
 		}
 
