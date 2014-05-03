@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Kafka.Client.Connection;
 using Kafka.Client.Metadata;
@@ -33,7 +34,7 @@ namespace Kafka.Client.Tests
 		}
 
 		[Test]
-		public async Task Test_Producer()
+		public void Test_Producer()
 		{
 			var encoder = new GuidEncoder();
 			var brokerConnectionManager = new BrokerConnectionManager(ClientId);
@@ -46,24 +47,25 @@ namespace Kafka.Client.Tests
 			var metadataManager = new MetadataManager(metadataStore, brokerConnectionManager, metadataManagerSettings);
 			var producerSettings = new KafkaProducerSettings
 			{
-				RequiredAcks = 0,
+				RequiredAcks = 1,
 				SendRetryCount = 5,
 				Timeout = 5,
 			};
 			var producer = new KafkaProducer<Guid, Guid>(encoder, encoder, new Partitioner(), brokerConnectionManager, metadataManager, producerSettings);
 
-			const int batchesCount = 10;
-			const int batchSize = 10;
+			const int batchesCount = 100;
+			const int batchSize = 100;
 
-			for (var i = 0; i < batchesCount; ++i)
+			var tasks = Enumerable.Range(0, batchesCount).Select(i =>
 			{
 				var messages = new KeyedMessage<Guid, Guid>[batchSize];
 				for (var j = 0; j < batchSize; ++j)
 				{
 					messages[j] = new KeyedMessage<Guid, Guid>(TopicName, Guid.NewGuid(), Guid.NewGuid());
 				}
-				await producer.SendMessagesAsync(messages);
-			}
+				return producer.SendMessagesAsync(messages);
+			});
+			Assert.True(Task.WaitAll(tasks.ToArray(), TimeSpan.FromSeconds(10)));
 		}
 	}
 }
