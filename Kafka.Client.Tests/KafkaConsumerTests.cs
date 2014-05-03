@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Threading;
 using Kafka.Client.Connection;
 using Kafka.Client.Consumer;
@@ -45,7 +46,7 @@ namespace Kafka.Client.Tests
 			var consumer = new KafkaConsumer<Guid, Guid>(decoder, decoder, brokerConnectionManager, metadataManager, settings);
 
 			var ev = new ManualResetEvent(false);
-			consumer.ConsumeMessages(TopicName, 0, 0).Subscribe(messageAndOffset => Console.WriteLine("offset: {0}", messageAndOffset.Offset));
+			consumer.ConsumeMessages(TopicName, 0, 0).Count().Subscribe(count => Console.WriteLine("messages count: {0}", count));
 			Assert.True(ev.WaitOne());
 		}
 	}

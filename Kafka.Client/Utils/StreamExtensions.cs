@@ -11,16 +11,34 @@ namespace Kafka.Client.Utils
 	{
 		public static async Task ReadExactlyAsync(this Stream stream, byte[] buffer, int offset, int count, CancellationToken cancellationToken)
 		{
-			var bytesRead = await stream.ReadAsync(buffer, offset, count, cancellationToken);
-			if (bytesRead != count)
-				throw new InvalidOperationException(string.Format("Stream read error: expected {0} bytes but has been read {1}", count, bytesRead));
+			var currentCount = count;
+			var currentOffset = offset;
+
+			while (currentCount > 0)
+			{
+				var bytesRead = await stream.ReadAsync(buffer, currentOffset, currentCount, cancellationToken);
+				if (bytesRead == 0)
+					throw new InvalidOperationException("Stream read error");
+
+				currentOffset += bytesRead;
+				currentCount -= bytesRead;
+			}
 		}
 
 		public static void ReadExactly(this Stream stream, byte[] buffer, int offset, int count)
 		{
-			var bytesRead = stream.Read(buffer, offset, count);
-			if (bytesRead != count)
-				throw new InvalidOperationException(string.Format("Stream read error: expected {0} bytes but has been read {1}", count, bytesRead));
+			var currentCount = count;
+			var currentOffset = offset;
+
+			while (currentCount > 0)
+			{
+				var bytesRead = stream.Read(buffer, currentOffset, currentCount);
+				if (bytesRead == 0)
+					throw new InvalidOperationException("Stream read error");
+
+				currentOffset += bytesRead;
+				currentCount -= bytesRead;
+			}
 		}
 
 		public static async Task<int> ReadInt32Async(this Stream stream, CancellationToken cancellationToken)
