@@ -28,9 +28,11 @@ namespace Kafka.Client.Connection.Protocol
 			{
 				var keyLength = Key != null ? Key.Length : 0;
 				var valueLength = Value != null ? Value.Length : 0;
-				return sizeof (UInt32) + 2*sizeof (byte) + 2*sizeof(Int32) + keyLength + valueLength;
+				return MinSize + keyLength + valueLength;
 			}
 		}
+
+		public const int MinSize = sizeof (UInt32) + 2*sizeof (byte) + 2*sizeof (Int32);
 
 		public void Write(Stream stream)
 		{
@@ -57,9 +59,14 @@ namespace Kafka.Client.Connection.Protocol
 			}
 		}
 
-		public static Message Read(Stream stream)
+		public static bool TryRead(Stream stream, out Message message)
 		{
-			var messageBytes = stream.ReadBytes();
+			message = null;
+
+			byte[] messageBytes;
+
+			if (!stream.TryReadBytes(out messageBytes))
+				return false;
 
 			var bufferSize = messageBytes.Length - sizeof(UInt32);
 			var buffer = new byte[bufferSize];
@@ -79,7 +86,8 @@ namespace Kafka.Client.Connection.Protocol
 				var attributes = (byte)substream.ReadByte();
 				var key = substream.ReadBytes();
 				var value = substream.ReadBytes();
-				return new Message(magicByte, attributes, key, value);
+				message = new Message(magicByte, attributes, key, value);
+				return true;
 			}
 		}
 

@@ -80,7 +80,7 @@ namespace Kafka.Client.Consumer
 
 					foreach (var messageSetItem in partitionItem.Messages)
 					{
-						currentOffset = messageSetItem.Offset + messageSetItem.Message.Size;
+						currentOffset = messageSetItem.NextOffset;
 						var key = keyDecoder.Decode(messageSetItem.Message.Key);
 						var value = valueDecoder.Decode(messageSetItem.Message.Value);
 						var keyedMessage = new KeyedMessage<TKey, TValue>(topic, key, value);

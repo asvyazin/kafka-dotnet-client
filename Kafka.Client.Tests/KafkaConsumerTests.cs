@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Reactive.Linq;
+using System.Diagnostics;
 using System.Threading;
 using Kafka.Client.Connection;
 using Kafka.Client.Consumer;
@@ -45,8 +45,19 @@ namespace Kafka.Client.Tests
 			};
 			var consumer = new KafkaConsumer<Guid, Guid>(decoder, decoder, brokerConnectionManager, metadataManager, settings);
 
+			var sw = Stopwatch.StartNew();
+			var sw1 = Stopwatch.StartNew();
+			var previousOffset = 0L;
 			var ev = new ManualResetEvent(false);
-			consumer.ConsumeMessages(TopicName, 0, 0).Count().Subscribe(count => Console.WriteLine("messages count: {0}", count));
+			consumer.ConsumeMessages(TopicName, 0, 0).Subscribe(messageAndOffset =>
+			{
+				if (messageAndOffset.Offset - previousOffset >= 100000)
+				{
+					Console.WriteLine("{0}, {1} / {2}", messageAndOffset.Offset, sw.ElapsedMilliseconds, sw1.ElapsedMilliseconds);
+					sw.Restart();
+					previousOffset = messageAndOffset.Offset;
+				}
+			});
 			Assert.True(ev.WaitOne());
 		}
 	}

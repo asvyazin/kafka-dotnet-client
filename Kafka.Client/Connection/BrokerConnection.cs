@@ -29,9 +29,16 @@ namespace Kafka.Client.Connection
 		public async Task<ResponseMessage> SendRequestAsync(RequestMessage request)
 		{
 			ThrowObjectDisposedExceptionIfNeeded();
+			ValidateBrokerRawConnectionStarted();
 			var rawRequest = ToRawRequest(request);
 			var rawResponse = await brokerRawConnection.SendRawRequestAsync(rawRequest);
 			return ResponseMessage.FromBytes(request.ApiKey, rawResponse.ResponseData);
+		}
+
+		private void ValidateBrokerRawConnectionStarted()
+		{
+			if (brokerRawConnectionStartedTask.IsFaulted || brokerRawConnectionStartedTask.IsCanceled || brokerRawConnectionStartedTask.IsCompleted)
+				throw new InvalidOperationException("Broker connection is in the wrong state", brokerRawConnectionStartedTask.Exception);
 		}
 
 		public async Task SendRequestFireAndForgetAsync(RequestMessage request)

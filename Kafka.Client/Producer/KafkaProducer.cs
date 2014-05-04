@@ -80,11 +80,11 @@ namespace Kafka.Client.Producer
 					}
 				}
 
+				messagesToSend = messagesToReSend;
 				if (!messagesToReSend.Any())
 					break;
 
 				await metadataManager.UpdateMetadata(topicsToUpdate.ToArray());
-				messagesToSend = messagesToReSend;
 			}
 
 			notSentMessages.AddRange(messagesToSend);

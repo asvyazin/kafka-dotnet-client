@@ -38,22 +38,35 @@ namespace Kafka.Client.Connection.Protocol
 			var messagesBytes = stream.ReadBytes();
 			using (var substream = new MemoryStream(messagesBytes))
 			{
-				if (substream.Length == 0)
-					yield break;
-
-				yield return Read(substream);
+				MessageSetItem messageSetItem;
+				while (TryRead(substream, out messageSetItem))
+					yield return messageSetItem;
 			}
 		}
 
-		public static MessageSetItem Read(Stream stream)
+		public static bool TryRead(Stream stream, out MessageSetItem messageSetItem)
 		{
-			var offset = stream.ReadInt64();
-			var message = Message.Read(stream);
-			return new MessageSetItem(offset, message);
+			messageSetItem = null;
+
+			Int64 offset;
+			if (!stream.TryReadInt64(out offset))
+				return false;
+
+			Message message;
+			if (!Message.TryRead(stream, out message))
+				return false;
+
+			messageSetItem = new MessageSetItem(offset, message);
+			return true;
 		}
 
 		public Message Message { get; private set; }
 
 		public Int64 Offset { get; private set; }
+
+		public Int64 NextOffset
+		{
+			get { return Offset + 1; }
+		}
 	}
 }

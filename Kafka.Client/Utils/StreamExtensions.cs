@@ -41,6 +41,14 @@ namespace Kafka.Client.Utils
 			}
 		}
 
+		public static bool TryReadExactly(this Stream stream, byte[] buffer, int offset, int count)
+		{
+			if (stream.Length - stream.Position < count)
+				return false;
+			stream.ReadExactly(buffer, offset, count);
+			return true;
+		}
+
 		public static async Task<int> ReadInt32Async(this Stream stream, CancellationToken cancellationToken)
 		{
 			const int length = sizeof (Int32);
@@ -57,6 +65,19 @@ namespace Kafka.Client.Utils
 			return BitConverter.ToInt32(buffer.Reverse().ToArray(), 0);
 		}
 
+		public static bool TryReadInt32(this Stream stream, out Int32 value)
+		{
+			value = default (Int32);
+
+			const int length = sizeof (Int32);
+			var buffer = new byte[length];
+			if (!stream.TryReadExactly(buffer, 0, length))
+				return false;
+
+			value = BitConverter.ToInt32(buffer.Reverse().ToArray(), 0);
+			return true;
+		}
+
 		public static UInt32 ReadUInt32(this Stream stream)
 		{
 			const int length = sizeof (UInt32);
@@ -71,6 +92,19 @@ namespace Kafka.Client.Utils
 			var buffer = new byte[length];
 			stream.ReadExactly(buffer, 0, length);
 			return BitConverter.ToInt64(buffer.Reverse().ToArray(), 0);
+		}
+
+		public static bool TryReadInt64(this Stream stream, out Int64 value)
+		{
+			value = default (Int64);
+
+			const int length = sizeof (Int64);
+			var buffer = new byte[length];
+			if (!stream.TryReadExactly(buffer, 0, length))
+				return false;
+
+			value = BitConverter.ToInt64(buffer.Reverse().ToArray(), 0);
+			return true;
 		}
 
 		public static async Task WriteInt32Async(this Stream stream, Int32 value)
@@ -136,6 +170,26 @@ namespace Kafka.Client.Utils
 			var buffer = new byte[length];
 			stream.ReadExactly(buffer, 0, length);
 			return buffer;
+		}
+
+		public static bool TryReadBytes(this Stream stream, out byte[] bytes)
+		{
+			bytes = null;
+
+			Int32 length;
+			if (!stream.TryReadInt32(out length))
+				return false;
+
+			if (length == -1)
+				return true;
+
+			var buffer = new byte[length];
+			if (!stream.TryReadExactly(buffer, 0, length))
+				return false;
+
+			bytes = new byte[length];
+			Array.Copy(buffer, bytes, length);
+			return true;
 		}
 
 		public static void WriteBytes(this Stream stream, byte[] value)
