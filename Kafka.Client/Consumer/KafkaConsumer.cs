@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Kafka.Client.Connection;
 using Kafka.Client.Connection.Protocol;
@@ -10,15 +11,12 @@ using Kafka.Client.Producer;
 
 namespace Kafka.Client.Consumer
 {
-	public class KafkaConsumer<TKey, TValue>: IDisposable
+	public class KafkaConsumer<TKey, TValue>
 	{
 		private readonly IDecoder<TKey> keyDecoder;
 		private readonly IDecoder<TValue> valueDecoder;
 		private readonly BrokerConnectionManager brokerConnectionManager;
 		private readonly MetadataManager metadataManager;
-
-		private bool disposed;
-		private readonly object locker = new object();
 		private readonly KafkaConsumerSettings settings;
 
 		public KafkaConsumer(IDecoder<TKey> keyDecoder, IDecoder<TValue> valueDecoder, BrokerConnectionManager brokerConnectionManager, MetadataManager metadataManager, KafkaConsumerSettings settings)
@@ -33,16 +31,16 @@ namespace Kafka.Client.Consumer
 		public IObservable<KeyedMessageAndOffset<TKey, TValue>> ConsumeMessages(string topic, Int32 partitionId, Int64 startOffset)
 		{
 			return Observable.Create<KeyedMessageAndOffset<TKey, TValue>>(
-				async observer => await SubscribeToMessagesAsync(observer, topic, partitionId, startOffset));
+				async (observer, token) => await SubscribeToMessagesAsync(observer, token, topic, partitionId, startOffset));
 		}
 
-		private async Task SubscribeToMessagesAsync(IObserver<KeyedMessageAndOffset<TKey, TValue>> observer, string topic, Int32 partitionId, Int64 startOffset)
+		private async Task SubscribeToMessagesAsync(IObserver<KeyedMessageAndOffset<TKey, TValue>> observer, CancellationToken token, string topic, Int32 partitionId, Int64 startOffset)
 		{
 			if (!metadataManager.IsKnownTopic(topic))
 				await metadataManager.UpdateMetadata(new[] {topic});
 
 			var currentOffset = startOffset;
-			while (!disposed)
+			while (!token.IsCancellationRequested)
 			{
 				var fetchRequest = new FetchRequest(-1, settings.MaxWaitTime, settings.MinBytes, new[]
 				{
@@ -88,17 +86,6 @@ namespace Kafka.Client.Consumer
 					}
 					break;
 				}
-			}
-		}
-
-		public void Dispose()
-		{
-			lock (locker)
-			{
-				if (disposed)
-					return;
-
-				disposed = true;
 			}
 		}
 	}
