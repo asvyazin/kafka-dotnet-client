@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Sockets;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,9 +55,22 @@ namespace Kafka.Client.Consumer
 				{
 					var brokerId = metadataManager.GetLeaderNodeId(topic, partitionId);
 					var brokerAddress = metadataManager.GetBroker(brokerId);
-					var brokerConnection = brokerConnectionManager.GetBrokerConnection(brokerAddress);
 
-					var fetchResponse = (FetchResponse)await brokerConnection.SendRequestAsync(fetchRequest);
+					FetchResponse fetchResponse;
+					try
+					{
+						var brokerConnection = brokerConnectionManager.GetBrokerConnection(brokerAddress);
+						fetchResponse = (FetchResponse) await brokerConnection.SendRequestAsync(fetchRequest);
+					}
+					catch (SocketException)
+					{
+						continue;
+					}
+					catch (ObjectDisposedException)
+					{
+						continue;
+					}
+
 					if (fetchResponse.TopicItems.Length != 1)
 						throw new InvalidOperationException(string.Format("Invalid fetch response, unexpected topic items count: {0}", fetchResponse.TopicItems.Length));
 					var topicItem = fetchResponse.TopicItems.First();
