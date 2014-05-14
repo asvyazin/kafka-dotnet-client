@@ -34,7 +34,7 @@ namespace Kafka.Client.Producer
 			if (unknownTopics.Any())
 				await metadataManager.UpdateMetadata(unknownTopics);
 
-			var notSentMessages = new List<KeyedMessage<TKey, TValue>>();
+			var notSentMessages = new List<KeyedMessageAndError<TKey, TValue>>();
 			IEnumerable<KeyedMessage<TKey, TValue>> messagesToSend = messages;
 			for (var i = 0; i < settings.SendRetryCount + 1; i++)
 			{
@@ -74,8 +74,11 @@ namespace Kafka.Client.Producer
 						}
 						else
 						{
-							// todo: add error code in exception
-							notSentMessages.AddRange(messagesWithError);
+							notSentMessages.AddRange(messagesWithError.Select(m => new KeyedMessageAndError<TKey, TValue>
+							{
+								Message = m,
+								Error = partitionItem.ErrorCode,
+							}));
 						}
 					}
 				}
@@ -87,7 +90,11 @@ namespace Kafka.Client.Producer
 				await metadataManager.UpdateMetadata(topicsToUpdate.ToArray());
 			}
 
-			notSentMessages.AddRange(messagesToSend);
+			notSentMessages.AddRange(messagesToSend.Select(m => new KeyedMessageAndError<TKey, TValue>
+			{
+				Message = m,
+				Error = ErrorCode.Unknown,
+			}));
 			if (notSentMessages.Any())
 				throw new SendMessagesFailedException<TKey, TValue>(notSentMessages.ToArray());
 		}

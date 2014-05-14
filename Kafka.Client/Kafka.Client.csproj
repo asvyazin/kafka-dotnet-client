@@ -118,6 +118,7 @@
     <Compile Include="Producer\IPartitioner.cs" />
     <Compile Include="Producer\KafkaProducer.cs" />
     <Compile Include="Producer\KafkaProducerSettings.cs" />
+    <Compile Include="Producer\KeyedMessageAndError.cs" />
     <Compile Include="Producer\SendMessagesFailedException.cs" />
     <Compile Include="Utils\BytesHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
