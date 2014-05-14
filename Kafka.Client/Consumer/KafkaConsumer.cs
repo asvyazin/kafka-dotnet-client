@@ -8,7 +8,6 @@ using Kafka.Client.Connection;
 using Kafka.Client.Connection.Protocol;
 using Kafka.Client.Connection.Protocol.Fetch;
 using Kafka.Client.Metadata;
-using Kafka.Client.Producer;
 
 namespace Kafka.Client.Consumer
 {

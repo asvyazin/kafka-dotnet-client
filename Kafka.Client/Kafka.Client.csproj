@@ -107,7 +107,8 @@
     <Compile Include="Consumer\IDecoder.cs" />
     <Compile Include="Consumer\KafkaConsumer.cs" />
     <Compile Include="Consumer\KafkaConsumerSettings.cs" />
-    <Compile Include="Consumer\KeyedMessageAndOffset.cs" />
+    <Compile Include="KeyedMessage.cs" />
+    <Compile Include="KeyedMessageAndOffset.cs" />
     <Compile Include="Metadata\MetadataManager.cs" />
     <Compile Include="Metadata\MetadataManagerSettings.cs" />
     <Compile Include="Metadata\Store\MetadataStore.cs" />
@@ -117,7 +118,6 @@
     <Compile Include="Producer\IPartitioner.cs" />
     <Compile Include="Producer\KafkaProducer.cs" />
     <Compile Include="Producer\KafkaProducerSettings.cs" />
-    <Compile Include="Producer\KeyedMessage.cs" />
     <Compile Include="Producer\SendMessagesFailedException.cs" />
     <Compile Include="Utils\BytesHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

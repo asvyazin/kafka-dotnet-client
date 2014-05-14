@@ -1,4 +1,4 @@
-﻿namespace Kafka.Client.Producer
+﻿namespace Kafka.Client
 {
 	public class KeyedMessage<TKey, TValue>
 	{

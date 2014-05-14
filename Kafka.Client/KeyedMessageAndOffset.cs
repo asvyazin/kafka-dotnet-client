@@ -1,7 +1,6 @@
 ﻿using System;
-using Kafka.Client.Producer;
 
-namespace Kafka.Client.Consumer
+namespace Kafka.Client
 {
 	public class KeyedMessageAndOffset<TKey, TValue>
 	{
