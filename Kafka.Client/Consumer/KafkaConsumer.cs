@@ -55,21 +55,14 @@ namespace Kafka.Client.Consumer
 					var brokerId = metadataManager.GetLeaderNodeId(topic, partitionId);
 					var brokerAddress = metadataManager.GetBroker(brokerId);
 
-					FetchResponse fetchResponse;
-					try
+					var result = await TryFetch(brokerAddress, fetchRequest);
+					if (result.Status != FetchResult.FetchStatus.Success)
 					{
-						var brokerConnection = brokerConnectionManager.GetBrokerConnection(brokerAddress);
-						fetchResponse = (FetchResponse) await brokerConnection.SendRequestAsync(fetchRequest);
-					}
-					catch (SocketException)
-					{
-						continue;
-					}
-					catch (ObjectDisposedException)
-					{
+						await metadataManager.UpdateMetadata(new[] { topic });
 						continue;
 					}
 
+					var fetchResponse = result.Response;
 					if (fetchResponse.TopicItems.Length != 1)
 						throw new InvalidOperationException(string.Format("Invalid fetch response, unexpected topic items count: {0}", fetchResponse.TopicItems.Length));
 					var topicItem = fetchResponse.TopicItems.First();
@@ -100,6 +93,54 @@ namespace Kafka.Client.Consumer
 					break;
 				}
 			}
+		}
+
+		private async Task<FetchResult> TryFetch(BrokerAddress brokerAddress, RequestMessage fetchRequest)
+		{
+			try
+			{
+				var brokerConnection = brokerConnectionManager.GetBrokerConnection(brokerAddress);
+				var fetchResponse = (FetchResponse)await brokerConnection.SendRequestAsync(fetchRequest);
+				return FetchResult.Success(fetchResponse);
+			}
+			catch (SocketException)
+			{
+				return FetchResult.ConnectionWasClosed();
+			}
+			catch (ObjectDisposedException)
+			{
+				return FetchResult.ConnectionWasClosed();
+			}
+		}
+
+		private class FetchResult
+		{
+			public static FetchResult Success(FetchResponse response)
+			{
+				return new FetchResult
+				{
+					Status = FetchStatus.Success,
+					Response = response,
+				};
+			}
+
+			public static FetchResult ConnectionWasClosed()
+			{
+				return new FetchResult
+				{
+					Status = FetchStatus.ConnectionWasClosed,
+					Response = null,
+				};
+			}
+
+			public enum FetchStatus
+			{
+				Success,
+				ConnectionWasClosed
+			}
+
+			public FetchStatus Status { get; private set; }
+			public FetchResponse Response { get; private set; }
 		}
 	}
 }
